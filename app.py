@@ -30,11 +30,14 @@ def inicializar_csv():
             writer.writerow([
                 "Fecha", "Nombre", "Telefono", "Motivo", 
                 "Tipo", "Barrio", "M2 Cubiertos", "M2 Descubiertos", 
-                "Dormitorios", "Cochera", "Estado", "Valor Sugerido USD"
+                "Dormitorios", "Cochera", "Estado", 
+                "Antiguedad", "Disposicion", "Situacion Juridica", "Amenities",
+                "Valor Sugerido USD"
             ])
 
 def guardar_lead(datos, valor_sugerido):
     inicializar_csv()
+    amenities_str = ", ".join(datos.get("amenities", [])) if isinstance(datos.get("amenities"), list) else str(datos.get("amenities", ""))
     with open(CSV_FILE, mode='a', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow([
@@ -49,6 +52,10 @@ def guardar_lead(datos, valor_sugerido):
             datos.get("dormitorios", ""),
             datos.get("cochera", ""),
             datos.get("estado", ""),
+            datos.get("antiguedad", "No especificado"),
+            datos.get("disposicion", "No especificado"),
+            datos.get("situacion_juridica", "No especificado"),
+            amenities_str,
             valor_sugerido
         ])
 
@@ -57,6 +64,10 @@ def enviar_notificacion_callmebot(datos, tasacion):
         print("CallMeBot no configurado correctamente.")
         return False
     
+    amenities_str = ", ".join(datos.get("amenities", [])) if isinstance(datos.get("amenities"), list) and datos.get("amenities") else datos.get("amenities", "Ninguno")
+    if not amenities_str:
+        amenities_str = "Ninguno"
+
     mensaje = (
         "🔥 *NUEVO PROPIETARIO TASÓ SU INMUEBLE*\n\n"
         f"👤 *Nombre:* {datos.get('nombre')}\n"
@@ -69,7 +80,11 @@ def enviar_notificacion_callmebot(datos, tasacion):
         f"• M² Patio/Balcón: {datos.get('m2_descubiertos', 0)} m²\n"
         f"• Dormitorios: {datos.get('dormitorios')}\n"
         f"• Cochera: {datos.get('cochera')}\n"
-        f"• Estado: {datos.get('estado')}\n\n"
+        f"• Estado: {datos.get('estado')}\n"
+        f"• Antigüedad: {datos.get('antiguedad', 'No especificado')}\n"
+        f"• Disposición: {datos.get('disposicion', 'No especificado')}\n"
+        f"• Situación Jurídica: {datos.get('situacion_juridica', 'No especificado')}\n"
+        f"• Amenities: {amenities_str}\n\n"
         f"💵 *Tasación Sugerida:* USD {tasacion.get('valor_sugerido', 0):,}\n"
         f"📊 *Rango:* USD {tasacion.get('valor_min', 0):,} - USD {tasacion.get('valor_max', 0):,}\n"
         f"📍 *USD/M²:* USD {tasacion.get('valor_m2', 0)}"
@@ -85,6 +100,10 @@ def enviar_notificacion_callmebot(datos, tasacion):
         return False
 
 def obtener_tasacion_gemini(datos):
+    amenities_str = ", ".join(datos.get("amenities", [])) if isinstance(datos.get("amenities"), list) and datos.get("amenities") else datos.get("amenities", "Ninguno")
+    if not amenities_str:
+        amenities_str = "Ninguno"
+
     prompt = f"""
 Eres un tasador inmobiliario profesional, perito y martillero matriculado de Córdoba Capital, Argentina, con más de 20 años de experiencia analizando el mercado local.
 
@@ -96,6 +115,10 @@ Debes realizar una tasación precisa, prudente y realista en dólares estadounid
 - Dormitorios: {datos.get('dormitorios')}
 - Cochera: {datos.get('cochera')}
 - Estado de conservación: {datos.get('estado')}
+- Antigüedad: {datos.get('antiguedad', 'No especificado')}
+- Disposición: {datos.get('disposicion', 'No especificado')}
+- Situación Jurídica / Título: {datos.get('situacion_juridica', 'No especificado')}
+- Amenities destacados: {amenities_str}
 
 Referencias de mercado inmobiliario de Córdoba Capital a considerar por zonas y barrios:
 - ZONA CENTRO Y ALREDEDORES UNIVERSITARIOS:
@@ -116,21 +139,26 @@ Referencias de mercado inmobiliario de Córdoba Capital a considerar por zonas y
   * Bella Vista, Paso de los Andes, Parque Capital, Los Naranjos, Los Plátanos, Las Palmas: USD 700 a 1.050/m².
 - ZONA ESTE / SURESTE:
   * San Vicente, Crisol Norte, Crisol Sur, Maipú 1ª Sección, Maipú 2ª Sección, General Bustos, Pueyrredón, Independiente: USD 700 a 1.100/m².
-- Patios, jardines y balcones computan entre el 30% y el 50% del valor m² cubierto según calidad.
-- Cochera cubierta suma entre USD 8.000 y USD 16.000 según demanda del barrio (crítica en Nueva Córdoba, Centro y General Paz).
-- Estado de conservación: 'A reciclar' penaliza entre un 20% y 35% respecto a 'Muy bueno' / 'A estrenar'.
 
-Responde ÚNICAMENTE en formato JSON plano (sin formato markdown adicional si es posible, o JSON válido) con esta estructura exacta:
+Ponderación técnica de variables adicionales en Córdoba:
+- Antigüedad: A estrenar (+5% a +10%), 1 a 10 años (neutro / óptimo), 10 a 25 años (-5% a -12%), +25 años (-15% a -25% salvo reciclado integral).
+- Disposición: Frente suele cotizar 5% a 10% más que contrafrente en Nueva Córdoba y General Paz por luminosidad y vistas. Interno castiga entre 10% y 15%.
+- Situación Jurídica: 'Escritura inmediata' es el valor estándar pleno de mercado (apto crédito hipotecario Bancor/UVA, gran valor agregado en Córdoba). 'Boleto de compraventa' suele requerir un descuento de negociación del 5% al 12% por falta de apto crédito inmediato.
+- Amenities: La presencia de Pileta, Quincho/SUM, Asador y Seguridad 24hs defiende el techo de mercado y acelera la venta en zonas como Nueva Córdoba, General Paz o Condominios de Zona Norte.
+- Patios, jardines y balcones computan entre el 30% y el 50% del valor m² cubierto.
+- Cochera cubierta suma entre USD 8.000 y USD 16.000 según la demanda del barrio.
+
+Responde ÚNICAMENTE en formato JSON plano (sin markdown, JSON válido) con esta estructura exacta:
 {{
   "valor_min": <entero en USD, valor conservador / venta rápida>,
   "valor_sugerido": <entero en USD, valor promedio de mercado recomendado>,
   "valor_max": <entero en USD, valor optimista / techo de mercado>,
   "valor_m2": <entero en USD por m² promedio ponderado estimado para la propiedad>,
-  "analisis_breve": "<1 o 2 oraciones profesionales explicando el posicionamiento en el mercado cordobés actual>",
+  "analisis_breve": "<1 o 2 oraciones profesionales explicando el posicionamiento en el mercado cordobés actual, ponderando su estado, título y comodidades>",
   "consejos": [
     "<Consejo 1 específico y accionable para defender el valor en Córdoba Capital>",
-    "<Consejo 2 sobre documentación, mejoras o presentación (Home Staging)>",
-    "<Consejo 3 sobre estrategia comercial o negociación>"
+    "<Consejo 2 sobre documentación (escritura/apto crédito), mejoras o presentación>",
+    "<Consejo 3 sobre estrategia comercial y velocidad de venta>"
   ]
 }}
 """
