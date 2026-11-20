@@ -144,14 +144,14 @@
                             </div>
                         </div>
 
-                        <!-- Barrio en Córdoba Capital con Búsqueda Rápida -->
+                        <!-- Barrio en Córdoba Capital y Alrededores con Búsqueda Rápida -->
                         <div>
                             <div class="flex items-center justify-between mb-2">
-                                <label for="barrio_input" class="block text-sm font-semibold text-slate-700">Barrio de Córdoba Capital *</label>
-                                <span class="text-[11px] text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded-md">50 barrios disponibles</span>
+                                <label for="barrio_input" class="block text-sm font-semibold text-slate-700">Barrio o Country de Córdoba / Gran Córdoba *</label>
+                                <span class="text-[11px] text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded-md">80+ zonas y countries</span>
                             </div>
                             <div class="relative">
-                                <input type="text" id="barrio_input" list="lista-barrios" autocomplete="off" placeholder="Escribe o selecciona tu barrio (ej: Nueva Córdoba, Urca...)" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 block p-3.5 pr-10">
+                                <input type="text" id="barrio_input" list="lista-barrios" autocomplete="off" placeholder="Escribe o selecciona tu barrio o country (ej: Cuesta Colorada, Urca, Valle Escondido...)" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 block p-3.5 pr-10">
                                 <input type="hidden" id="barrio" name="barrio" value="">
                                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-400">
                                     <i class="fa-solid fa-magnifying-glass text-xs"></i>
@@ -162,28 +162,51 @@
                                     <option value="Alta Córdoba">
                                     <option value="Alto Alberdi">
                                     <option value="Alto Verde">
+                                    <option value="Altos del Chateau">
                                     <option value="Argüello">
                                     <option value="Bajo Palermo">
+                                    <option value="Barrancas de San José (La Calera)">
                                     <option value="Barrio Jardín">
                                     <option value="Bella Vista">
+                                    <option value="Campos del Virrey">
+                                    <option value="Cañuelas Country Golf">
+                                    <option value="Causana">
                                     <option value="Centro">
                                     <option value="Cerro Chico">
                                     <option value="Cerro de las Rosas">
+                                    <option value="Chacras de la Villa (Villa Allende)">
                                     <option value="Chateau Carreras">
+                                    <option value="Cinco Lomas (La Calera)">
+                                    <option value="Claros del Bosque">
                                     <option value="Cofico">
                                     <option value="Colinas del Cerro">
+                                    <option value="Country Jockey Club">
+                                    <option value="Country Las Delicias">
+                                    <option value="Country Lomas de la Carolina">
+                                    <option value="Country San Isidro (Villa Allende)">
                                     <option value="Crisol Norte">
                                     <option value="Crisol Sur">
+                                    <option value="Cuesta Colorada (La Calera)">
+                                    <option value="Docta Urbanización Inteligente">
                                     <option value="Ducasse">
+                                    <option value="El Bosque Country">
+                                    <option value="El Diquecito (La Calera)">
+                                    <option value="El Tipal">
                                     <option value="Escobar">
+                                    <option value="Estancia Q2 (Mendiolaza)">
                                     <option value="General Bustos">
                                     <option value="General Paz">
                                     <option value="Güemes">
-                                    <option value="Independiente">
                                     <option value="Inaudi">
+                                    <option value="Independiente">
                                     <option value="Iponá">
                                     <option value="Juniors">
+                                    <option value="La Arbolada (La Calera)">
+                                    <option value="La Deseada (La Calera)">
+                                    <option value="La Estanzuela (La Calera)">
                                     <option value="La France">
+                                    <option value="La Rufina (La Calera)">
+                                    <option value="Las Flores / Nuevo Jardín">
                                     <option value="Las Palmas">
                                     <option value="Las Rosas">
                                     <option value="Lomas de San Martín">
@@ -191,8 +214,9 @@
                                     <option value="Los Plátanos">
                                     <option value="Maipú 1ª Sección">
                                     <option value="Maipú 2ª Sección">
-                                    <option value="Manantiales">
+                                    <option value="Manantiales I y II">
                                     <option value="Marqués de Sobremonte">
+                                    <option value="Miradores de Manantiales">
                                     <option value="Nueva Córdoba">
                                     <option value="Observatorio">
                                     <option value="Parque Capital">
@@ -200,18 +224,25 @@
                                     <option value="Parque Vélez Sarsfield">
                                     <option value="Paso de los Andes">
                                     <option value="Poeta Lugones">
+                                    <option value="Prados de Manantiales">
                                     <option value="Providencia">
                                     <option value="Pueyrredón">
                                     <option value="Quintas de Santa Ana">
+                                    <option value="San Alfonso del Talar (Mendiolaza)">
                                     <option value="San Martín">
                                     <option value="San Vicente">
+                                    <option value="Siete Soles (Autopista Carlos Paz)">
+                                    <option value="Tejas 4">
+                                    <option value="Tejas del Sur">
                                     <option value="Urca">
+                                    <option value="Valle Escondido (y barrios internos)">
                                     <option value="Villa Belgrano">
                                     <option value="Villa Cabrera">
-                                    <option value="Otro barrio de Córdoba">
+                                    <option value="Villa Sol">
+                                    <option value="Otro barrio de Córdoba / Gran Córdoba">
                                 </datalist>
                             </div>
-                            <span class="text-xs text-slate-400 mt-1 block">Escribe letras para filtrar o haz clic para desplegar los barrios.</span>
+                            <span class="text-xs text-slate-400 mt-1 block">Escribe letras para filtrar o haz clic para desplegar los barrios y countries.</span>
                         </div>
 
                         <!-- Metros Cuadrados -->
@@ -522,6 +553,19 @@
                             </div>
                         </div>
 
+                    </div>
+
+                    <!-- AVISO VISIBLE DE ESTIMACIÓN ORIENTATIVA (LEGAL / RESPALDO) -->
+                    <div class="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-4 sm:p-5 flex items-start gap-3.5 text-left">
+                        <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0 text-sm mt-0.5">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <h5 class="text-xs font-bold uppercase tracking-wider text-amber-900">Aviso de Estimación Orientativa</h5>
+                            <p class="text-xs text-amber-950/80 leading-relaxed">
+                                <strong>Importante:</strong> Esta tasación es una estimación preliminar generada por inteligencia artificial en base a promedios estadísticos de la zona. No constituye una tasación oficial ni un valor definitivo de cierre, ya que factores como la calidad constructiva, luminosidad, entorno inmediato, estado real de conservación y documentación pueden modificar el precio final. Para obtener una valoración exacta y profesional, recomendamos coordinar una visita presencial sin cargo.
+                            </p>
+                        </div>
                     </div>
 
                     <!-- NUEVO: Comparativa Visual de Velocidad de Venta -->
