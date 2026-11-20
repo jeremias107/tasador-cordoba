@@ -11,6 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2pdf.js CDN para descarga elegante de PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -41,9 +43,6 @@
         .step-transition {
             transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .gradient-border {
-            background: linear-gradient(135deg, #2563eb, #10b981);
-        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between antialiased selection:bg-blue-500 selection:text-white">
@@ -62,7 +61,8 @@
             </div>
             <div class="flex items-center space-x-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Mercado Córdoba Activo</span>
+                <span class="hidden sm:inline">Mercado Córdoba Activo</span>
+                <span class="sm:hidden">Córdoba Activo</span>
             </div>
         </div>
     </header>
@@ -71,7 +71,7 @@
     <main class="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex-grow w-full">
 
         <!-- Hero Section -->
-        <div class="text-center mb-10">
+        <div class="text-center mb-8">
             <div class="inline-flex items-center space-x-2 bg-blue-50 border border-blue-200/80 rounded-full px-4 py-1.5 text-xs font-semibold text-blue-700 mb-4 shadow-sm">
                 <i class="fa-solid fa-sparkles text-blue-600"></i>
                 <span>Valuación instantánea con IA para Propietarios</span>
@@ -87,11 +87,17 @@
         <!-- Progress Indicator -->
         <div id="progressContainer" class="mb-8">
             <div class="flex items-center justify-between mb-2 px-2 text-xs font-bold uppercase tracking-wider text-slate-500">
-                <span id="stepBadge1" class="text-blue-600 flex items-center gap-1.5"><i class="fa-solid fa-house"></i> 1. Características</span>
-                <span id="stepBadge2" class="text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-lock"></i> 2. Desbloquear Informe</span>
+                <span id="stepBadge1" class="text-blue-600 flex items-center gap-1.5">
+                    <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">1</span> 
+                    Paso 1 de 2: Características
+                </span>
+                <span id="stepBadge2" class="text-slate-400 flex items-center gap-1.5">
+                    <span class="w-5 h-5 rounded-full bg-slate-300 text-slate-600 flex items-center justify-center text-[10px]">2</span> 
+                    Paso 2 de 2: Desbloqueo
+                </span>
             </div>
-            <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden shadow-inner">
-                <div id="progressBar" class="bg-gradient-to-r from-blue-600 to-indigo-600 h-2 rounded-full transition-all duration-500 ease-out" style="width: 50%;"></div>
+            <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden shadow-inner">
+                <div id="progressBar" class="bg-gradient-to-r from-blue-600 to-indigo-600 h-2.5 rounded-full transition-all duration-500 ease-out" style="width: 50%;"></div>
             </div>
         </div>
 
@@ -205,7 +211,7 @@
                                     <option value="Otro barrio de Córdoba">
                                 </datalist>
                             </div>
-                            <span class="text-xs text-slate-400 mt-1 block">Puedes escribir para autocompletar o desplegar la lista completa.</span>
+                            <span class="text-xs text-slate-400 mt-1 block">Escribe letras para filtrar o haz clic para desplegar los barrios.</span>
                         </div>
 
                         <!-- Metros Cuadrados -->
@@ -296,9 +302,75 @@
                             </div>
                         </div>
 
-                        <div class="pt-4">
+                        <!-- VARIABLES AVANZADAS DE TASACIÓN (Córdoba Capital) -->
+                        <div class="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200 space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-200/80 pb-2">
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-check text-blue-600"></i> Variables Clave para Mayor Precisión
+                                </span>
+                                <span class="text-[11px] text-slate-400 font-medium">Recomendado</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <!-- Antigüedad -->
+                                <div>
+                                    <label for="antiguedad" class="block text-xs font-semibold text-slate-600 mb-1.5">Antigüedad</label>
+                                    <select id="antiguedad" name="antiguedad" class="w-full bg-white border border-slate-200 text-slate-800 text-xs font-medium rounded-xl p-2.5 focus:ring-2 focus:ring-blue-600">
+                                        <option value="A estrenar">A estrenar</option>
+                                        <option value="1-10 años" selected>1-10 años</option>
+                                        <option value="10-25 años">10-25 años</option>
+                                        <option value="+25 años">+25 años</option>
+                                    </select>
+                                </div>
+
+                                <!-- Disposición -->
+                                <div>
+                                    <label for="disposicion" class="block text-xs font-semibold text-slate-600 mb-1.5">Disposición</label>
+                                    <select id="disposicion" name="disposicion" class="w-full bg-white border border-slate-200 text-slate-800 text-xs font-medium rounded-xl p-2.5 focus:ring-2 focus:ring-blue-600">
+                                        <option value="Frente" selected>Frente</option>
+                                        <option value="Contrafrente">Contrafrente</option>
+                                        <option value="Interno / No aplica">Interno / No aplica</option>
+                                    </select>
+                                </div>
+
+                                <!-- Situación Jurídica -->
+                                <div>
+                                    <label for="situacion_juridica" class="block text-xs font-semibold text-slate-600 mb-1.5">Situación Jurídica</label>
+                                    <select id="situacion_juridica" name="situacion_juridica" class="w-full bg-white border border-slate-200 text-slate-800 text-xs font-medium rounded-xl p-2.5 focus:ring-2 focus:ring-blue-600">
+                                        <option value="Escritura inmediata (Apto crédito)" selected>Escritura inmediata</option>
+                                        <option value="Boleto de compraventa">Boleto de compraventa</option>
+                                        <option value="Posesión / Sucesión / Otro">Posesión / Otro</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Amenities Destacados -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-2">Amenities y Comodidades Destacadas:</label>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                    <label class="flex items-center gap-2 p-2 bg-white rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 transition text-xs font-medium text-slate-700">
+                                        <input type="checkbox" name="amenities" value="Piscina" class="rounded text-blue-600 focus:ring-blue-500">
+                                        <span><i class="fa-solid fa-water-ladder text-blue-500 mr-1"></i> Piscina</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2 bg-white rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 transition text-xs font-medium text-slate-700">
+                                        <input type="checkbox" name="amenities" value="Quincho/SUM" class="rounded text-blue-600 focus:ring-blue-500">
+                                        <span><i class="fa-solid fa-utensils text-amber-500 mr-1"></i> Quincho / SUM</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2 bg-white rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 transition text-xs font-medium text-slate-700">
+                                        <input type="checkbox" name="amenities" value="Seguridad 24hs" class="rounded text-blue-600 focus:ring-blue-500">
+                                        <span><i class="fa-solid fa-shield text-emerald-500 mr-1"></i> Seguridad 24h</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2 bg-white rounded-xl border border-slate-200 cursor-pointer hover:border-blue-400 transition text-xs font-medium text-slate-700">
+                                        <input type="checkbox" name="amenities" value="Balcón/Asador" class="rounded text-blue-600 focus:ring-blue-500">
+                                        <span><i class="fa-solid fa-fire text-rose-500 mr-1"></i> Balcón / Asador</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
                             <button type="button" onclick="irAlPaso2()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl shadow-lg shadow-blue-600/30 transition-all duration-200 flex items-center justify-center space-x-2 text-base">
-                                <span>Continuar al Paso Final</span>
+                                <span>Continuar al Paso 2 de 2</span>
                                 <i class="fa-solid fa-arrow-right text-sm"></i>
                             </button>
                         </div>
@@ -335,12 +407,12 @@
                         <div>
                             <label for="telefono" class="block text-sm font-semibold text-slate-700 mb-2">WhatsApp de Contacto *</label>
                             <div class="relative">
-                                <input type="tel" id="telefono" name="telefono" placeholder="Ej: 351 688 1234" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 p-3.5 pl-10">
+                                <input type="tel" id="telefono" name="telefono" placeholder="Ej: 351 688 1234 (mínimo 8 dígitos)" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 p-3.5 pl-10">
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-emerald-500">
                                     <i class="fa-brands fa-whatsapp text-base"></i>
                                 </div>
                             </div>
-                            <span class="text-xs text-slate-400 mt-1 block">Número de Córdoba o Argentina preferentemente.</span>
+                            <span class="text-xs text-slate-400 mt-1 block">Ingresa tu número con código de área (sin 0 ni 15, al menos 8 dígitos).</span>
                         </div>
 
                         <!-- Motivo -->
@@ -375,7 +447,7 @@
                         <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 flex items-start gap-2.5">
                             <i class="fa-solid fa-shield-halved text-blue-600 text-sm mt-0.5"></i>
                             <p class="text-xs text-slate-500 leading-relaxed">
-                                <strong class="text-slate-700">100% Confidencial y sin compromiso:</strong> Tus datos están seguros y no serán compartidos. Este informe técnico es orientativo y totalmente gratuito.
+                                <strong class="text-slate-700">100% Confidencial y sin compromiso:</strong> Tus datos están protegidos. El informe técnico es orientativo, profesional y totalmente gratuito.
                             </p>
                         </div>
 
@@ -397,98 +469,149 @@
             <!-- RESULTADO FINAL: Tarjeta Visual de Tasación -->
             <div id="resultadoContainer" class="p-6 sm:p-10 step-transition hidden">
                 
-                <!-- Encabezado del Informe -->
-                <div class="text-center mb-8 border-b border-slate-100 pb-6">
-                    <div class="inline-flex items-center justify-center w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full mb-3 shadow-inner">
-                        <i class="fa-solid fa-circle-check text-2xl"></i>
-                    </div>
-                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 block mb-1">Informe Generado Exitosamente</span>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900" id="resTituloPropiedad">Valuación de Mercado</h2>
-                    <p class="text-sm text-slate-500 mt-1" id="resSubtitulo">Estimación referencial para Córdoba Capital</p>
-                </div>
-
-                <!-- Bloque de Precios (Rango en USD) -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <!-- Área imprimible en PDF -->
+                <div id="fichaTasacionPDF" class="space-y-6">
                     
-                    <!-- Conservador -->
-                    <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200 text-center flex flex-col justify-between">
-                        <div>
-                            <span class="text-xs font-semibold uppercase text-slate-500 tracking-wider">Valor Conservador</span>
-                            <div class="text-xs text-slate-400 mb-2">Venta rápida / Ofertas agresivas</div>
+                    <!-- Encabezado del Informe -->
+                    <div class="text-center border-b border-slate-100 pb-5">
+                        <div class="inline-flex items-center justify-center w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full mb-3 shadow-inner">
+                            <i class="fa-solid fa-circle-check text-2xl"></i>
                         </div>
-                        <div>
-                            <div class="text-xl sm:text-2xl font-bold text-slate-700" id="resMin">USD --</div>
-                        </div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 block mb-1">Informe Oficial Generado</span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900" id="resTituloPropiedad">Valuación de Mercado</h2>
+                        <p class="text-sm text-slate-500 mt-1" id="resSubtitulo">Estimación referencial para Córdoba Capital</p>
+                        <div class="text-[11px] text-slate-400 mt-2 font-medium" id="resFechaReporte"></div>
                     </div>
 
-                    <!-- Sugerido (Destacado) -->
-                    <div class="bg-gradient-to-b from-blue-50 to-indigo-50/60 rounded-2xl p-5 sm:p-6 border-2 border-blue-600 text-center relative shadow-lg shadow-blue-500/10 flex flex-col justify-between">
-                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[11px] font-extrabold uppercase px-3 py-0.5 rounded-full shadow-sm tracking-wide">
-                            Recomendado
-                        </span>
-                        <div>
-                            <span class="text-xs font-bold uppercase text-blue-900 tracking-wider">Valor de Mercado Sugerido</span>
-                            <div class="text-xs text-blue-600/80 mb-2">Equilibrio perfecto precio / tiempo</div>
-                        </div>
-                        <div>
-                            <div class="text-3xl sm:text-4xl font-extrabold text-blue-600" id="resSugerido">USD --</div>
-                        </div>
-                    </div>
-
-                    <!-- Optimista -->
-                    <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200 text-center flex flex-col justify-between">
-                        <div>
-                            <span class="text-xs font-semibold uppercase text-slate-500 tracking-wider">Valor Optimista</span>
-                            <div class="text-xs text-slate-400 mb-2">Techo máximo de negociación</div>
-                        </div>
-                        <div>
-                            <div class="text-xl sm:text-2xl font-bold text-slate-700" id="resMax">USD --</div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- M2 y Análisis breve -->
-                <div class="bg-slate-900 text-white rounded-2xl p-5 sm:p-6 mb-6">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg">
-                                <i class="fa-solid fa-chart-line"></i>
+                    <!-- Bloque de Precios (Rango en USD) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        
+                        <!-- Conservador -->
+                        <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200 text-center flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-semibold uppercase text-slate-500 tracking-wider">Valor Conservador</span>
+                                <div class="text-xs text-slate-400 mb-2">Venta rápida / Ofertas contado</div>
                             </div>
                             <div>
-                                <div class="text-xs text-slate-400 uppercase font-semibold">Valor por m² en la zona</div>
-                                <div class="text-lg font-bold text-white" id="resM2">USD -- / m²</div>
+                                <div class="text-xl sm:text-2xl font-bold text-slate-700" id="resMin">USD --</div>
                             </div>
                         </div>
-                        <span class="px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs font-medium border border-slate-700" id="resBarrioBadge">
-                            Córdoba Capital
-                        </span>
+
+                        <!-- Sugerido (Destacado) -->
+                        <div class="bg-gradient-to-b from-blue-50 to-indigo-50/60 rounded-2xl p-5 sm:p-6 border-2 border-blue-600 text-center relative shadow-lg shadow-blue-500/10 flex flex-col justify-between">
+                            <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[11px] font-extrabold uppercase px-3 py-0.5 rounded-full shadow-sm tracking-wide">
+                                Recomendado
+                            </span>
+                            <div>
+                                <span class="text-xs font-bold uppercase text-blue-900 tracking-wider">Valor de Mercado Sugerido</span>
+                                <div class="text-xs text-blue-600/80 mb-2">Equilibrio perfecto precio / tiempo</div>
+                            </div>
+                            <div>
+                                <div class="text-3xl sm:text-4xl font-extrabold text-blue-600" id="resSugerido">USD --</div>
+                            </div>
+                        </div>
+
+                        <!-- Optimista -->
+                        <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200 text-center flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-semibold uppercase text-slate-500 tracking-wider">Valor Optimista</span>
+                                <div class="text-xs text-slate-400 mb-2">Techo máximo de negociación</div>
+                            </div>
+                            <div>
+                                <div class="text-xl sm:text-2xl font-bold text-slate-700" id="resMax">USD --</div>
+                            </div>
+                        </div>
+
                     </div>
-                    <p class="text-sm text-slate-300 italic leading-relaxed" id="resAnalisis">
-                        Cargando análisis técnico...
-                    </p>
+
+                    <!-- NUEVO: Comparativa Visual de Velocidad de Venta -->
+                    <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-gauge-high text-blue-600"></i> Velocidad Estimada de Cierre en Córdoba
+                            </span>
+                            <span class="text-[11px] text-slate-500 font-medium">Parámetros actuales de plaza</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="bg-white p-3.5 rounded-xl border-l-4 border-emerald-500 shadow-sm">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-emerald-800">Precio Sugerido</span>
+                                    <span class="text-[11px] font-extrabold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">Demanda Alta</span>
+                                </div>
+                                <div class="text-sm font-extrabold text-slate-800 mt-1">45 a 90 días estimados</div>
+                                <div class="text-xs text-slate-500 mt-0.5">Máxima atracción de inversores calificados y créditos hipotecarios.</div>
+                            </div>
+                            <div class="bg-white p-3.5 rounded-xl border-l-4 border-amber-500 shadow-sm">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-amber-800">Precio Optimista</span>
+                                    <span class="text-[11px] font-extrabold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Demanda Moderada</span>
+                                </div>
+                                <div class="text-sm font-extrabold text-slate-800 mt-1">+150 días en mercado</div>
+                                <div class="text-xs text-slate-500 mt-0.5">Requiere comprador específico y mayor margen de contraoferta.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- M2 y Análisis breve -->
+                    <div class="bg-slate-900 text-white rounded-2xl p-5 sm:p-6">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg">
+                                    <i class="fa-solid fa-chart-line"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-slate-400 uppercase font-semibold">Valor por m² en la zona</div>
+                                    <div class="text-lg font-bold text-white" id="resM2">USD -- / m²</div>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs font-medium border border-slate-700" id="resBarrioBadge">
+                                Córdoba Capital
+                            </span>
+                        </div>
+                        <p class="text-sm text-slate-300 italic leading-relaxed" id="resAnalisis">
+                            Cargando análisis técnico...
+                        </p>
+                    </div>
+
+                    <!-- 3 Recomendaciones Clave de Gemini -->
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb text-amber-500"></i> Recomendaciones para defender tu precio en Córdoba:
+                        </h3>
+                        <div class="space-y-2.5" id="resConsejos">
+                            <!-- Items inyectados dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Datos de contacto y pie de reporte para PDF -->
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                        <span>Tasador Online Córdoba Capital</span>
+                        <span>Contacto Directo: +54 9 3573 49-9317</span>
+                    </div>
+
                 </div>
 
-                <!-- 3 Recomendaciones Clave de Gemini -->
-                <div class="mb-8">
-                    <h3 class="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-lightbulb text-amber-500"></i> Recomendaciones para defender tu precio en Córdoba:
-                    </h3>
-                    <div class="space-y-2.5" id="resConsejos">
-                        <!-- Items inyectados dinámicamente -->
-                    </div>
-                </div>
+                <!-- BOTONES DE ACCIÓN (WhatsApp + Descarga PDF) -->
+                <div class="mt-8 space-y-3">
+                    
+                    <!-- Botón Descarga PDF Oficial -->
+                    <button type="button" onclick="descargarInformePDF()" class="w-full bg-white hover:bg-slate-50 text-slate-800 font-bold py-3.5 px-6 rounded-2xl border-2 border-slate-200 shadow-sm transition flex items-center justify-center gap-2 text-sm sm:text-base">
+                        <i class="fa-solid fa-file-pdf text-rose-600 text-lg"></i>
+                        <span>Descargar Informe de Tasación en PDF</span>
+                    </button>
 
-                <!-- CTA WhatsApp Personalizado -->
-                <div class="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-6 text-center">
-                    <h4 class="text-lg font-bold text-emerald-950 mb-1">¿Querés una confirmación presencial y exacta?</h4>
-                    <p class="text-xs sm:text-sm text-emerald-800 mb-4 max-w-md mx-auto">
-                        Los valores varían por piso, orientación, luminosidad y detalles constructivos. Agendá una visita profesional sin costo.
-                    </p>
-                    <a id="btnWhatsAppCTA" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-emerald-600/30 transition transform hover:-translate-y-0.5 text-sm sm:text-base w-full sm:w-auto">
-                        <i class="fa-brands fa-whatsapp text-xl"></i>
-                        <span>Agendar visita presencial sin cargo para confirmar valor exacto</span>
-                    </a>
+                    <!-- CTA WhatsApp Personalizado -->
+                    <div class="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-6 text-center">
+                        <h4 class="text-lg font-bold text-emerald-950 mb-1">¿Querés una confirmación presencial y exacta?</h4>
+                        <p class="text-xs sm:text-sm text-emerald-800 mb-4 max-w-md mx-auto">
+                            Los valores varían por piso, orientación, luminosidad y detalles constructivos. Agendá una visita profesional sin costo.
+                        </p>
+                        <a id="btnWhatsAppCTA" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-emerald-600/30 transition transform hover:-translate-y-0.5 text-sm sm:text-base w-full sm:w-auto">
+                            <i class="fa-brands fa-whatsapp text-2xl"></i>
+                            <span>Agendar visita presencial sin cargo para confirmar valor exacto</span>
+                        </a>
+                    </div>
+
                 </div>
 
                 <!-- Botón Volver a Cotizar -->
@@ -511,11 +634,12 @@
         </div>
     </footer>
 
-    <!-- Script de lógica de navegación y llamada AJAX -->
+    <!-- Script de lógica de navegación, llamada AJAX y PDF -->
     <script>
         const miWhatsAppBackend = "{{ mi_whatsapp }}";
 
         let formDataState = {};
+        let tasacionState = {};
 
         function irAlPaso2() {
             const form = document.getElementById('tasadorForm');
@@ -545,7 +669,10 @@
 
             // Actualizar Progress Bar
             document.getElementById('progressBar').style.width = '100%';
-            document.getElementById('stepBadge1').classList.replace('text-blue-600', 'text-slate-400');
+            document.getElementById('stepBadge1').innerHTML = '<span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px]"><i class="fa-solid fa-check"></i></span> Paso 1: Listo';
+            document.getElementById('stepBadge1').classList.replace('text-blue-600', 'text-emerald-600');
+            
+            document.getElementById('stepBadge2').innerHTML = '<span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">2</span> Paso 2 de 2: Desbloqueo';
             document.getElementById('stepBadge2').classList.replace('text-slate-400', 'text-blue-600');
 
             window.scrollTo({ top: 120, behavior: 'smooth' });
@@ -556,7 +683,10 @@
             document.getElementById('paso1').classList.remove('hidden');
 
             document.getElementById('progressBar').style.width = '50%';
-            document.getElementById('stepBadge1').classList.replace('text-slate-400', 'text-blue-600');
+            document.getElementById('stepBadge1').innerHTML = '<span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">1</span> Paso 1 de 2: Características';
+            document.getElementById('stepBadge1').classList.replace('text-emerald-600', 'text-blue-600');
+            
+            document.getElementById('stepBadge2').innerHTML = '<span class="w-5 h-5 rounded-full bg-slate-300 text-slate-600 flex items-center justify-center text-[10px]">2</span> Paso 2 de 2: Desbloqueo';
             document.getElementById('stepBadge2').classList.replace('text-blue-600', 'text-slate-400');
         }
 
@@ -566,16 +696,23 @@
             const telefono = form.telefono.value.trim();
 
             if (!nombre) {
-                alert("Por favor ingresa tu nombre.");
+                alert("Por favor ingresa tu nombre y apellido.");
                 form.nombre.focus();
                 return;
             }
 
-            if (!telefono || telefono.length < 6) {
-                alert("Por favor ingresa un teléfono de WhatsApp válido.");
+            // Validación estricta de teléfono: al menos 8 dígitos numéricos
+            const digitosTel = telefono.replace(/\D/g, '');
+            if (digitosTel.length < 8) {
+                alert("Por favor ingresa un número de teléfono/WhatsApp válido de al menos 8 dígitos (ej: 351 688 1234).");
                 form.telefono.focus();
                 return;
             }
+
+            // Recolectar checkboxes de amenities
+            const amenitiesChecked = [];
+            const checkboxes = form.querySelectorAll('input[name="amenities"]:checked');
+            checkboxes.forEach(cb => amenitiesChecked.push(cb.value));
 
             // Recolectar datos
             const payload = {
@@ -586,6 +723,10 @@
                 dormitorios: form.dormitorios.value,
                 cochera: form.cochera.value,
                 estado: form.estado.value,
+                antiguedad: form.antiguedad.value,
+                disposicion: form.disposicion.value,
+                situacion_juridica: form.situacion_juridica.value,
+                amenities: amenitiesChecked,
                 nombre: nombre,
                 telefono: telefono,
                 motivo: form.motivo.value
@@ -609,6 +750,7 @@
                     throw new Error(data.error || "No se pudo calcular la tasación.");
                 }
 
+                tasacionState = data.tasacion;
                 mostrarResultados(data.tasacion, payload);
 
             } catch (error) {
@@ -625,7 +767,7 @@
 
             if (loading) {
                 btn.disabled = true;
-                btnText.textContent = "Analizando mercado con IA...";
+                btnText.textContent = "Analizando variables de mercado con IA...";
                 btnIcon.classList.add('hidden');
                 btnLoader.classList.remove('hidden');
             } else {
@@ -647,10 +789,15 @@
             document.getElementById('tasadorForm').classList.add('hidden');
             document.getElementById('progressContainer').classList.add('hidden');
 
-            // Llenar datos
+            // Llenar datos de propiedad
             document.getElementById('resTituloPropiedad').textContent = `${datos.tipo} en ${datos.barrio}`;
-            document.getElementById('resSubtitulo').textContent = `${datos.m2_cubiertos} m² cubiertos • ${datos.dormitorios} • Estado ${datos.estado}`;
             
+            const amenitiesTexto = (datos.amenities && datos.amenities.length > 0) ? ` • Amenities: ${datos.amenities.join(', ')}` : '';
+            document.getElementById('resSubtitulo').textContent = `${datos.m2_cubiertos} m² cubiertos • ${datos.dormitorios} • ${datos.antiguedad} • Estado ${datos.estado}${amenitiesTexto}`;
+            
+            const hoy = new Date();
+            document.getElementById('resFechaReporte').textContent = `Informe emitido el ${hoy.toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })} para ${datos.nombre}`;
+
             document.getElementById('resMin').textContent = `USD ${formatUSD(tasacion.valor_min)}`;
             document.getElementById('resSugerido').textContent = `USD ${formatUSD(tasacion.valor_sugerido)}`;
             document.getElementById('resMax').textContent = `USD ${formatUSD(tasacion.valor_max)}`;
@@ -672,10 +819,10 @@
                 consejosCont.appendChild(el);
             });
 
-            // Enlace WhatsApp CTA
+            // Enlace WhatsApp CTA con mensaje pre-rellenado exacto
             const wsNumber = miWhatsAppBackend || "5493573499317";
             const textoChat = encodeURIComponent(
-                `Hola! Hice la tasación online para mi ${datos.tipo} en ${datos.barrio} (${datos.m2_cubiertos}m²) y el valor sugerido fue USD ${formatUSD(tasacion.valor_sugerido)}. Me gustaría coordinar la visita presencial sin cargo para confirmar el valor exacto. Mi nombre es ${datos.nombre}.`
+                `Hola! Hice la tasación online para mi ${datos.tipo} en ${datos.barrio} (${datos.m2_cubiertos} m² cubiertos) y el valor de mercado sugerido fue USD ${formatUSD(tasacion.valor_sugerido)}. Me gustaría coordinar la visita presencial sin cargo para confirmar el valor exacto. Mi nombre es ${datos.nombre}.`
             );
             const wsLink = `https://wa.me/${wsNumber}?text=${textoChat}`;
             document.getElementById('btnWhatsAppCTA').setAttribute('href', wsLink);
@@ -683,6 +830,20 @@
             // Mostrar contenedor
             document.getElementById('resultadoContainer').classList.remove('hidden');
             window.scrollTo({ top: 120, behavior: 'smooth' });
+        }
+
+        function descargarInformePDF() {
+            const elemento = document.getElementById('fichaTasacionPDF');
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     `Tasacion_${(formDataState.barrio || 'Cordoba').replace(/\s+/g, '_')}_${(formDataState.nombre || 'Propietario').replace(/\s+/g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Iniciar descarga
+            html2pdf().set(opt).from(elemento).save();
         }
 
         function reiniciarTasador() {
