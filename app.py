@@ -97,13 +97,28 @@ Debes realizar una tasación precisa, prudente y realista en dólares estadounid
 - Cochera: {datos.get('cochera')}
 - Estado de conservación: {datos.get('estado')}
 
-Referencias de mercado de Córdoba Capital a considerar:
-- Barrios Premium (Cerro de las Rosas, Villa Belgrano): USD 1.200 a 1.800/m² en muy buen estado/estrenar.
-- Barrios de Alta Demanda / Jóvenes / Estudiantes (Nueva Córdoba): USD 1.400 a 2.100/m² según categoría y antigüedad; General Paz: USD 1.100 a 1.600/m²; Güemes: USD 1.000 a 1.500/m².
-- Barrios Tradicionales / Residenciales (Alta Córdoba, Cofico, Jardín): USD 900 a 1.400/m².
-- Barrios Céntricos y Consolidados (Centro, Alberdi): USD 700 a 1.100/m².
-- Patios / Balcones computan generalmente al 30-50% del valor m² cubierto. Cochera agrega entre USD 8.000 y 15.000 según el barrio.
-- Estado 'A reciclar' castiga el valor entre un 20% y 35% respecto a 'Muy bueno'.
+Referencias de mercado inmobiliario de Córdoba Capital a considerar por zonas y barrios:
+- ZONA CENTRO Y ALREDEDORES UNIVERSITARIOS:
+  * Nueva Córdoba: USD 1.400 a 2.200/m² (alta demanda estudiantil e inversores; premium sobre Av. Yrigoyen, Chacabuco, Rondeau).
+  * General Paz y Juniors: USD 1.100 a 1.700/m² (polo gastronómico, residencial de categoría).
+  * Güemes y Observatorio: USD 950 a 1.500/m² (área cultural y comercial en auge).
+  * Centro, Alberdi, Alto Alberdi y Quintas de Santa Ana: USD 750 a 1.150/m² (zona comercial, conectividad y consolidación).
+- ZONA NORTE RESIDENCIAL / ALTA GAMA:
+  * Cerro de las Rosas, Villa Belgrano, Urca: USD 1.250 a 1.900/m² (lotes amplios, casas de categoría y condominios modernos).
+  * Alto Verde, Colinas del Cerro, Bajo Palermo, Las Rosas, Chateau Carreras: USD 1.100 a 1.600/m².
+  * Argüello, Villa Cabrera, Poeta Lugones, Alejandro Centeno: USD 850 a 1.350/m².
+- ZONA NORTE / CENTRO RESIDENCIAL:
+  * Alta Córdoba y Cofico: USD 950 a 1.500/m² (gran demanda residencial tradicional y gastronómica).
+  * San Martín, Lomas de San Martín, Providencia, Ducasse, Escobar, La France, Marqués de Sobremonte: USD 750 a 1.100/m².
+- ZONA SUR / SUROESTE:
+  * Manantiales: USD 1.100 a 1.650/m² (urbanización moderna en fuerte expansión).
+  * Barrio Jardín, Iponá, Inaudi, Parque Vélez Sarsfield: USD 950 a 1.450/m² (cercano a Ciudad Universitaria y countries sur).
+  * Bella Vista, Paso de los Andes, Parque Capital, Los Naranjos, Los Plátanos, Las Palmas: USD 700 a 1.050/m².
+- ZONA ESTE / SURESTE:
+  * San Vicente, Crisol Norte, Crisol Sur, Maipú 1ª Sección, Maipú 2ª Sección, General Bustos, Pueyrredón, Independiente: USD 700 a 1.100/m².
+- Patios, jardines y balcones computan entre el 30% y el 50% del valor m² cubierto según calidad.
+- Cochera cubierta suma entre USD 8.000 y USD 16.000 según demanda del barrio (crítica en Nueva Córdoba, Centro y General Paz).
+- Estado de conservación: 'A reciclar' penaliza entre un 20% y 35% respecto a 'Muy bueno' / 'A estrenar'.
 
 Responde ÚNICAMENTE en formato JSON plano (sin formato markdown adicional si es posible, o JSON válido) con esta estructura exacta:
 {{
