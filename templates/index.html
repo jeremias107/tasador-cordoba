@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasador Online Córdoba | Valuación Inmobiliaria Inteligente</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#0f172a',
+                        },
+                        emerald: {
+                            500: '#10b981',
+                            600: '#059669',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .step-transition {
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .gradient-border {
+            background: linear-gradient(135deg, #2563eb, #10b981);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between antialiased selection:bg-blue-500 selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+                    <i class="fa-solid fa-building-circle-check text-lg"></i>
+                </div>
+                <div>
+                    <span class="font-extrabold text-xl tracking-tight text-slate-900 block leading-tight">Tasador<span class="text-blue-600">Córdoba</span></span>
+                    <span class="text-xs text-slate-400 font-medium tracking-wide uppercase">Inteligencia de Mercado</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Mercado Córdoba Activo</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex-grow w-full">
+
+        <!-- Hero Section -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center space-x-2 bg-blue-50 border border-blue-200/80 rounded-full px-4 py-1.5 text-xs font-semibold text-blue-700 mb-4 shadow-sm">
+                <i class="fa-solid fa-sparkles text-blue-600"></i>
+                <span>Valuación instantánea con IA para Propietarios</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-3">
+                ¿Cuánto vale realmente tu propiedad hoy?
+            </h1>
+            <p class="text-base sm:text-lg text-slate-600 max-w-xl mx-auto">
+                Obtén un informe de valuación inmobiliaria basado en transacciones reales de Córdoba Capital en menos de 1 minuto y 100% gratis.
+            </p>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div id="progressContainer" class="mb-8">
+            <div class="flex items-center justify-between mb-2 px-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                <span id="stepBadge1" class="text-blue-600 flex items-center gap-1.5"><i class="fa-solid fa-house"></i> 1. Características</span>
+                <span id="stepBadge2" class="text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-lock"></i> 2. Desbloquear Informe</span>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden shadow-inner">
+                <div id="progressBar" class="bg-gradient-to-r from-blue-600 to-indigo-600 h-2 rounded-full transition-all duration-500 ease-out" style="width: 50%;"></div>
+            </div>
+        </div>
+
+        <!-- Form Card Container -->
+        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden relative">
+
+            <form id="tasadorForm" onsubmit="event.preventDefault();">
+                
+                <!-- PASO 1: Datos de la Propiedad -->
+                <div id="paso1" class="p-6 sm:p-10 step-transition block">
+                    <div class="mb-6 border-b border-slate-100 pb-4">
+                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-blue-600"></i> Paso 1: Datos del Inmueble
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-1">Completa los atributos clave para un cálculo certero.</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Tipo de Propiedad -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Tipo de Inmueble *</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="tipo" value="Departamento" class="peer sr-only" checked>
+                                    <div class="p-3 text-center rounded-xl border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:bg-slate-50 transition font-medium text-sm flex flex-col items-center gap-1.5">
+                                        <i class="fa-solid fa-building text-slate-400 peer-checked:text-blue-600 text-lg"></i>
+                                        <span>Departamento</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="tipo" value="Casa" class="peer sr-only">
+                                    <div class="p-3 text-center rounded-xl border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:bg-slate-50 transition font-medium text-sm flex flex-col items-center gap-1.5">
+                                        <i class="fa-solid fa-house-chimney text-slate-400 peer-checked:text-blue-600 text-lg"></i>
+                                        <span>Casa</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="tipo" value="Duplex/PH" class="peer sr-only">
+                                    <div class="p-3 text-center rounded-xl border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:bg-slate-50 transition font-medium text-sm flex flex-col items-center gap-1.5">
+                                        <i class="fa-solid fa-layer-group text-slate-400 peer-checked:text-blue-600 text-lg"></i>
+                                        <span>Dúplex / PH</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Barrio en Córdoba Capital -->
+                        <div>
+                            <label for="barrio" class="block text-sm font-semibold text-slate-700 mb-2">Barrio de Córdoba Capital *</label>
+                            <div class="relative">
+                                <select id="barrio" name="barrio" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 block p-3.5 pr-10 appearance-none">
+                                    <option value="" disabled selected>Selecciona tu barrio...</option>
+                                    <option value="Nueva Córdoba">Nueva Córdoba</option>
+                                    <option value="General Paz">General Paz</option>
+                                    <option value="Centro">Centro</option>
+                                    <option value="Alberdi">Alberdi</option>
+                                    <option value="Cerro de las Rosas">Cerro de las Rosas</option>
+                                    <option value="Villa Belgrano">Villa Belgrano</option>
+                                    <option value="Alta Córdoba">Alta Córdoba</option>
+                                    <option value="Cofico">Cofico</option>
+                                    <option value="Güemes">Güemes</option>
+                                    <option value="Jardín">Jardín</option>
+                                    <option value="Otro">Otro barrio de Córdoba Capital</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-400">
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Metros Cuadrados -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="m2_cubiertos" class="block text-sm font-semibold text-slate-700 mb-2">M² Cubiertos *</label>
+                                <div class="relative">
+                                    <input type="number" id="m2_cubiertos" name="m2_cubiertos" min="15" max="3000" placeholder="Ej: 65" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 p-3.5 pl-10">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                        <i class="fa-solid fa-ruler-combined text-sm"></i>
+                                    </div>
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-xs text-slate-400 font-bold">m²</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="m2_descubiertos" class="block text-sm font-semibold text-slate-700 mb-2">M² Patio / Balcón</label>
+                                <div class="relative">
+                                    <input type="number" id="m2_descubiertos" name="m2_descubiertos" min="0" max="5000" placeholder="Ej: 10" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 p-3.5 pl-10">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                        <i class="fa-solid fa-tree text-sm"></i>
+                                    </div>
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-xs text-slate-400 font-bold">m²</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dormitorios y Cochera -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="dormitorios" class="block text-sm font-semibold text-slate-700 mb-2">Dormitorios *</label>
+                                <select id="dormitorios" name="dormitorios" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 p-3.5">
+                                    <option value="Monoambiente">Monoambiente</option>
+                                    <option value="1 Dormitorio" selected>1 Dormitorio</option>
+                                    <option value="2 Dormitorios">2 Dormitorios</option>
+                                    <option value="3 Dormitorios">3 Dormitorios</option>
+                                    <option value="4 o más Dormitorios">4 o más Dormitorios</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">¿Tiene Cochera? *</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="cochera" value="No" class="peer sr-only" checked>
+                                        <div class="p-3 text-center rounded-xl border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50/50 font-medium text-sm transition">
+                                            No
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="cochera" value="Sí" class="peer sr-only">
+                                        <div class="p-3 text-center rounded-xl border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50/50 font-medium text-sm transition">
+                                            Sí
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Estado General -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Estado de Conservación *</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="estado" value="A estrenar" class="peer sr-only">
+                                    <div class="p-2.5 text-center rounded-xl border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50/50 font-medium text-xs sm:text-sm transition">
+                                        A estrenar
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="estado" value="Muy bueno" class="peer sr-only" checked>
+                                    <div class="p-2.5 text-center rounded-xl border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50/50 font-medium text-xs sm:text-sm transition">
+                                        Muy bueno
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="estado" value="Bueno" class="peer sr-only">
+                                    <div class="p-2.5 text-center rounded-xl border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50/50 font-medium text-xs sm:text-sm transition">
+                                        Bueno
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="estado" value="A reciclar" class="peer sr-only">
+                                    <div class="p-2.5 text-center rounded-xl border-2 border-slate-200 peer-checked:border-blue-600 peer-checked:bg-blue-50/50 font-medium text-xs sm:text-sm transition">
+                                        A reciclar
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="button" onclick="irAlPaso2()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl shadow-lg shadow-blue-600/30 transition-all duration-200 flex items-center justify-center space-x-2 text-base">
+                                <span>Continuar al Paso Final</span>
+                                <i class="fa-solid fa-arrow-right text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 2: Desbloqueo del Informe -->
+                <div id="paso2" class="p-6 sm:p-10 step-transition hidden">
+                    <div class="mb-6 border-b border-slate-100 pb-4">
+                        <div class="flex items-center justify-between mb-1">
+                            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-unlock-keyhole text-blue-600"></i> Paso 2: Desbloquear Valuación
+                            </h2>
+                            <button type="button" onclick="volverAlPaso1()" class="text-xs text-blue-600 hover:underline font-semibold flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-left"></i> Volver a editar
+                            </button>
+                        </div>
+                        <p class="text-sm text-slate-500">¿A qué nombre y WhatsApp te enviamos el respaldo oficial?</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Nombre -->
+                        <div>
+                            <label for="nombre" class="block text-sm font-semibold text-slate-700 mb-2">Tu Nombre y Apellido *</label>
+                            <div class="relative">
+                                <input type="text" id="nombre" name="nombre" placeholder="Ej: Marcelo Rossi" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 p-3.5 pl-10">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                    <i class="fa-solid fa-user text-sm"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- WhatsApp / Teléfono -->
+                        <div>
+                            <label for="telefono" class="block text-sm font-semibold text-slate-700 mb-2">WhatsApp de Contacto *</label>
+                            <div class="relative">
+                                <input type="tel" id="telefono" name="telefono" placeholder="Ej: 351 688 1234" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 p-3.5 pl-10">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-emerald-500">
+                                    <i class="fa-brands fa-whatsapp text-base"></i>
+                                </div>
+                            </div>
+                            <span class="text-xs text-slate-400 mt-1 block">Número de Córdoba o Argentina preferentemente.</span>
+                        </div>
+
+                        <!-- Motivo -->
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">¿Cuál es tu situación actual? *</label>
+                            <div class="space-y-2.5">
+                                <label class="flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                                    <input type="radio" name="motivo" value="Quiero vender pronto" class="text-blue-600 focus:ring-blue-500" checked>
+                                    <div class="ml-3">
+                                        <span class="text-sm font-bold text-slate-800 block">Quiero vender pronto (en los próximos meses)</span>
+                                        <span class="text-xs text-slate-400">Busco conocer el precio competitivo para salir al mercado.</span>
+                                    </div>
+                                </label>
+                                <label class="flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                                    <input type="radio" name="motivo" value="Solo curiosidad / evaluando" class="text-blue-600 focus:ring-blue-500">
+                                    <div class="ml-3">
+                                        <span class="text-sm font-bold text-slate-800 block">Solo curiosidad / evaluando opciones</span>
+                                        <span class="text-xs text-slate-400">Quiero estar al tanto de la valorización de mi patrimonio.</span>
+                                    </div>
+                                </label>
+                                <label class="flex items-center p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                                    <input type="radio" name="motivo" value="Permuta" class="text-blue-600 focus:ring-blue-500">
+                                    <div class="ml-3">
+                                        <span class="text-sm font-bold text-slate-800 block">Permuta / Cambio por mayor o menor</span>
+                                        <span class="text-xs text-slate-400">Evalúo entregar mi inmueble como parte de pago.</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Cláusula de Privacidad -->
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 flex items-start gap-2.5">
+                            <i class="fa-solid fa-shield-halved text-blue-600 text-sm mt-0.5"></i>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                <strong class="text-slate-700">100% Confidencial y sin compromiso:</strong> Tus datos están seguros y no serán compartidos. Este informe técnico es orientativo y totalmente gratuito.
+                            </p>
+                        </div>
+
+                        <div class="pt-2">
+                            <button type="button" id="btnCalcular" onclick="procesarTasacion()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-2xl shadow-lg shadow-blue-500/25 transition-all duration-200 flex items-center justify-center space-x-2 text-base">
+                                <span id="btnText">Ver Mi Valuación Inmediata</span>
+                                <i id="btnIcon" class="fa-solid fa-bolt text-amber-300"></i>
+                                <svg id="btnLoader" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+            <!-- RESULTADO FINAL: Tarjeta Visual de Tasación -->
+            <div id="resultadoContainer" class="p-6 sm:p-10 step-transition hidden">
+                
+                <!-- Encabezado del Informe -->
+                <div class="text-center mb-8 border-b border-slate-100 pb-6">
+                    <div class="inline-flex items-center justify-center w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full mb-3 shadow-inner">
+                        <i class="fa-solid fa-circle-check text-2xl"></i>
+                    </div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 block mb-1">Informe Generado Exitosamente</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900" id="resTituloPropiedad">Valuación de Mercado</h2>
+                    <p class="text-sm text-slate-500 mt-1" id="resSubtitulo">Estimación referencial para Córdoba Capital</p>
+                </div>
+
+                <!-- Bloque de Precios (Rango en USD) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    
+                    <!-- Conservador -->
+                    <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200 text-center flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-semibold uppercase text-slate-500 tracking-wider">Valor Conservador</span>
+                            <div class="text-xs text-slate-400 mb-2">Venta rápida / Ofertas agresivas</div>
+                        </div>
+                        <div>
+                            <div class="text-xl sm:text-2xl font-bold text-slate-700" id="resMin">USD --</div>
+                        </div>
+                    </div>
+
+                    <!-- Sugerido (Destacado) -->
+                    <div class="bg-gradient-to-b from-blue-50 to-indigo-50/60 rounded-2xl p-5 sm:p-6 border-2 border-blue-600 text-center relative shadow-lg shadow-blue-500/10 flex flex-col justify-between">
+                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[11px] font-extrabold uppercase px-3 py-0.5 rounded-full shadow-sm tracking-wide">
+                            Recomendado
+                        </span>
+                        <div>
+                            <span class="text-xs font-bold uppercase text-blue-900 tracking-wider">Valor de Mercado Sugerido</span>
+                            <div class="text-xs text-blue-600/80 mb-2">Equilibrio perfecto precio / tiempo</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl sm:text-4xl font-extrabold text-blue-600" id="resSugerido">USD --</div>
+                        </div>
+                    </div>
+
+                    <!-- Optimista -->
+                    <div class="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200 text-center flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-semibold uppercase text-slate-500 tracking-wider">Valor Optimista</span>
+                            <div class="text-xs text-slate-400 mb-2">Techo máximo de negociación</div>
+                        </div>
+                        <div>
+                            <div class="text-xl sm:text-2xl font-bold text-slate-700" id="resMax">USD --</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- M2 y Análisis breve -->
+                <div class="bg-slate-900 text-white rounded-2xl p-5 sm:p-6 mb-6">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-lg">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs text-slate-400 uppercase font-semibold">Valor por m² en la zona</div>
+                                <div class="text-lg font-bold text-white" id="resM2">USD -- / m²</div>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs font-medium border border-slate-700" id="resBarrioBadge">
+                            Córdoba Capital
+                        </span>
+                    </div>
+                    <p class="text-sm text-slate-300 italic leading-relaxed" id="resAnalisis">
+                        Cargando análisis técnico...
+                    </p>
+                </div>
+
+                <!-- 3 Recomendaciones Clave de Gemini -->
+                <div class="mb-8">
+                    <h3 class="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-lightbulb text-amber-500"></i> Recomendaciones para defender tu precio en Córdoba:
+                    </h3>
+                    <div class="space-y-2.5" id="resConsejos">
+                        <!-- Items inyectados dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- CTA WhatsApp Personalizado -->
+                <div class="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-6 text-center">
+                    <h4 class="text-lg font-bold text-emerald-950 mb-1">¿Querés una confirmación presencial y exacta?</h4>
+                    <p class="text-xs sm:text-sm text-emerald-800 mb-4 max-w-md mx-auto">
+                        Los valores varían por piso, orientación, luminosidad y detalles constructivos. Agendá una visita profesional sin costo.
+                    </p>
+                    <a id="btnWhatsAppCTA" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-emerald-600/30 transition transform hover:-translate-y-0.5 text-sm sm:text-base w-full sm:w-auto">
+                        <i class="fa-brands fa-whatsapp text-xl"></i>
+                        <span>Agendar visita presencial sin cargo para confirmar valor exacto</span>
+                    </a>
+                </div>
+
+                <!-- Botón Volver a Cotizar -->
+                <div class="text-center mt-6">
+                    <button type="button" onclick="reiniciarTasador()" class="text-xs text-slate-400 hover:text-slate-600 font-semibold underline">
+                        Realizar otra consulta
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+        <div class="max-w-5xl mx-auto px-4">
+            <p>© 2026 Tasador Inmobiliario Córdoba Capital. Desarrollado con inteligencia artificial especializada en mercado argentino.</p>
+        </div>
+    </footer>
+
+    <!-- Script de lógica de navegación y llamada AJAX -->
+    <script>
+        const miWhatsAppBackend = "{{ mi_whatsapp }}";
+
+        let formDataState = {};
+
+        function irAlPaso2() {
+            const form = document.getElementById('tasadorForm');
+            const barrio = form.barrio.value;
+            const m2Cubiertos = form.m2_cubiertos.value;
+
+            if (!barrio) {
+                alert("Por favor selecciona un barrio de Córdoba Capital.");
+                form.barrio.focus();
+                return;
+            }
+
+            if (!m2Cubiertos || m2Cubiertos <= 0) {
+                alert("Por favor ingresa los m² cubiertos.");
+                form.m2_cubiertos.focus();
+                return;
+            }
+
+            // Cambiar vista de paso
+            document.getElementById('paso1').classList.add('hidden');
+            document.getElementById('paso2').classList.remove('hidden');
+
+            // Actualizar Progress Bar
+            document.getElementById('progressBar').style.width = '100%';
+            document.getElementById('stepBadge1').classList.replace('text-blue-600', 'text-slate-400');
+            document.getElementById('stepBadge2').classList.replace('text-slate-400', 'text-blue-600');
+
+            window.scrollTo({ top: 120, behavior: 'smooth' });
+        }
+
+        function volverAlPaso1() {
+            document.getElementById('paso2').classList.add('hidden');
+            document.getElementById('paso1').classList.remove('hidden');
+
+            document.getElementById('progressBar').style.width = '50%';
+            document.getElementById('stepBadge1').classList.replace('text-slate-400', 'text-blue-600');
+            document.getElementById('stepBadge2').classList.replace('text-blue-600', 'text-slate-400');
+        }
+
+        async function procesarTasacion() {
+            const form = document.getElementById('tasadorForm');
+            const nombre = form.nombre.value.trim();
+            const telefono = form.telefono.value.trim();
+
+            if (!nombre) {
+                alert("Por favor ingresa tu nombre.");
+                form.nombre.focus();
+                return;
+            }
+
+            if (!telefono || telefono.length < 6) {
+                alert("Por favor ingresa un teléfono de WhatsApp válido.");
+                form.telefono.focus();
+                return;
+            }
+
+            // Recolectar datos
+            const payload = {
+                tipo: form.tipo.value,
+                barrio: form.barrio.value,
+                m2_cubiertos: form.m2_cubiertos.value,
+                m2_descubiertos: form.m2_descubiertos.value || 0,
+                dormitorios: form.dormitorios.value,
+                cochera: form.cochera.value,
+                estado: form.estado.value,
+                nombre: nombre,
+                telefono: telefono,
+                motivo: form.motivo.value
+            };
+
+            formDataState = payload;
+
+            // UI de carga
+            setLoading(true);
+
+            try {
+                const response = await fetch('/api/tasar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || "No se pudo calcular la tasación.");
+                }
+
+                mostrarResultados(data.tasacion, payload);
+
+            } catch (error) {
+                alert("Error al procesar: " + error.message);
+                setLoading(false);
+            }
+        }
+
+        function setLoading(loading) {
+            const btn = document.getElementById('btnCalcular');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+            const btnLoader = document.getElementById('btnLoader');
+
+            if (loading) {
+                btn.disabled = true;
+                btnText.textContent = "Analizando mercado con IA...";
+                btnIcon.classList.add('hidden');
+                btnLoader.classList.remove('hidden');
+            } else {
+                btn.disabled = false;
+                btnText.textContent = "Ver Mi Valuación Inmediata";
+                btnIcon.classList.remove('hidden');
+                btnLoader.classList.add('hidden');
+            }
+        }
+
+        function formatUSD(num) {
+            return new Intl.NumberFormat('en-US').format(Math.round(num));
+        }
+
+        function mostrarResultados(tasacion, datos) {
+            setLoading(false);
+
+            // Ocultar formulario y progress container
+            document.getElementById('tasadorForm').classList.add('hidden');
+            document.getElementById('progressContainer').classList.add('hidden');
+
+            // Llenar datos
+            document.getElementById('resTituloPropiedad').textContent = `${datos.tipo} en ${datos.barrio}`;
+            document.getElementById('resSubtitulo').textContent = `${datos.m2_cubiertos} m² cubiertos • ${datos.dormitorios} • Estado ${datos.estado}`;
+            
+            document.getElementById('resMin').textContent = `USD ${formatUSD(tasacion.valor_min)}`;
+            document.getElementById('resSugerido').textContent = `USD ${formatUSD(tasacion.valor_sugerido)}`;
+            document.getElementById('resMax').textContent = `USD ${formatUSD(tasacion.valor_max)}`;
+
+            document.getElementById('resM2').textContent = `USD ${formatUSD(tasacion.valor_m2)} / m²`;
+            document.getElementById('resBarrioBadge').textContent = `Barrio ${datos.barrio}`;
+            document.getElementById('resAnalisis').textContent = `"${tasacion.analisis_breve}"`;
+
+            // Consejos
+            const consejosCont = document.getElementById('resConsejos');
+            consejosCont.innerHTML = '';
+            (tasacion.consejos || []).forEach((c, idx) => {
+                const el = document.createElement('div');
+                el.className = "flex items-start gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs sm:text-sm text-slate-700";
+                el.innerHTML = `
+                    <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">${idx + 1}</span>
+                    <span>${c}</span>
+                `;
+                consejosCont.appendChild(el);
+            });
+
+            // Enlace WhatsApp CTA
+            const wsNumber = miWhatsAppBackend || "5493573499317";
+            const textoChat = encodeURIComponent(
+                `Hola! Hice la tasación online para mi ${datos.tipo} en ${datos.barrio} (${datos.m2_cubiertos}m²) y el valor sugerido fue USD ${formatUSD(tasacion.valor_sugerido)}. Me gustaría coordinar la visita presencial sin cargo para confirmar el valor exacto. Mi nombre es ${datos.nombre}.`
+            );
+            const wsLink = `https://wa.me/${wsNumber}?text=${textoChat}`;
+            document.getElementById('btnWhatsAppCTA').setAttribute('href', wsLink);
+
+            // Mostrar contenedor
+            document.getElementById('resultadoContainer').classList.remove('hidden');
+            window.scrollTo({ top: 120, behavior: 'smooth' });
+        }
+
+        function reiniciarTasador() {
+            document.getElementById('tasadorForm').reset();
+            document.getElementById('resultadoContainer').classList.add('hidden');
+            document.getElementById('tasadorForm').classList.remove('hidden');
+            document.getElementById('progressContainer').classList.remove('hidden');
+            volverAlPaso1();
+        }
+    </script>
+</body>
+</html>
