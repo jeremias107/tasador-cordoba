@@ -595,9 +595,9 @@
                 <div class="mt-8 space-y-3">
                     
                     <!-- Botón Descarga PDF Oficial -->
-                    <button type="button" onclick="descargarInformePDF()" class="w-full bg-white hover:bg-slate-50 text-slate-800 font-bold py-3.5 px-6 rounded-2xl border-2 border-slate-200 shadow-sm transition flex items-center justify-center gap-2 text-sm sm:text-base">
+                    <button type="button" id="btnDescargarPDF" onclick="descargarInformePDF()" class="w-full bg-white hover:bg-slate-50 text-slate-800 font-bold py-3.5 px-6 rounded-2xl border-2 border-slate-200 shadow-sm transition flex items-center justify-center gap-2 text-sm sm:text-base">
                         <i class="fa-solid fa-file-pdf text-rose-600 text-lg"></i>
-                        <span>Descargar Informe de Tasación en PDF</span>
+                        <span id="btnDescargarPDFTexto">Descargar Informe de Tasación en PDF</span>
                     </button>
 
                     <!-- CTA WhatsApp Personalizado -->
@@ -832,18 +832,51 @@
             window.scrollTo({ top: 120, behavior: 'smooth' });
         }
 
-        function descargarInformePDF() {
-            const elemento = document.getElementById('fichaTasacionPDF');
-            const opt = {
-                margin:       [10, 10, 10, 10],
-                filename:     `Tasacion_${(formDataState.barrio || 'Cordoba').replace(/\s+/g, '_')}_${(formDataState.nombre || 'Propietario').replace(/\s+/g, '_')}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+        async function descargarInformePDF() {
+            const btn = document.getElementById('btnDescargarPDF');
+            const btnTexto = document.getElementById('btnDescargarPDFTexto');
 
-            // Iniciar descarga
-            html2pdf().set(opt).from(elemento).save();
+            if (!formDataState || !tasacionState) {
+                alert("No hay datos disponibles para generar el PDF.");
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btnTexto.textContent = "Generando PDF oficial...";
+
+                const response = await fetch('/descargar-pdf', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        datos: formDataState,
+                        tasacion: tasacionState
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Error en el servidor al generar el PDF.");
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                
+                const barrioLimpio = (formDataState.barrio || 'Cordoba').replace(/\s+/g, '_');
+                a.download = `Informe_Tasacion_${barrioLimpio}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+
+            } catch (error) {
+                alert("No se pudo descargar el informe: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btnTexto.textContent = "Descargar Informe de Tasación en PDF";
+            }
         }
 
         function reiniciarTasador() {
