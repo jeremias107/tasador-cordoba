@@ -107,11 +107,14 @@ def obtener_tasacion_gemini(datos):
         amenities_str = "Ninguno"
 
     prompt = f"""
-Eres un tasador inmobiliario profesional, perito y martillero matriculado de Córdoba Capital, Argentina, con más de 20 años de experiencia analizando el mercado local.
+Eres un tasador inmobiliario perito y martillero matriculado de Córdoba Capital y Gran Córdoba, Argentina, con más de 20 años de experiencia cerrando operaciones efectivas en plaza.
 
-Debes realizar una tasación precisa, prudente y realista en dólares estadounidenses (USD) para el siguiente inmueble en Córdoba Capital:
+REGLA CRUCIAL DE VALUACIÓN:
+Debes calcular VALORES REALES DE CIERRE (operaciones efectivas de compraventa cerradas en USD billete), y NO precios inflados de lista o publicación en portales (los cuales en Córdoba suelen estar sobrevaluados entre un 15% y un 25%). La tasación debe ser prudente, precisa y aterrizada a la liquidez real del mercado.
+
+Inmueble a tasar:
 - Tipo: {datos.get('tipo')}
-- Barrio: {datos.get('barrio')}
+- Barrio / Country / Zona: {datos.get('barrio')}
 - Metros cuadrados cubiertos: {datos.get('m2_cubiertos')} m²
 - Metros cuadrados de balcón / terraza / patio: {datos.get('m2_descubiertos', 0)} m²
 - Dormitorios: {datos.get('dormitorios')}
@@ -122,45 +125,35 @@ Debes realizar una tasación precisa, prudente y realista en dólares estadounid
 - Situación Jurídica / Título: {datos.get('situacion_juridica', 'No especificado')}
 - Amenities destacados: {amenities_str}
 
-Referencias de mercado inmobiliario de Córdoba Capital a considerar por zonas y barrios:
-- ZONA CENTRO Y ALREDEDORES UNIVERSITARIOS:
-  * Nueva Córdoba: USD 1.400 a 2.200/m² (alta demanda estudiantil e inversores; premium sobre Av. Yrigoyen, Chacabuco, Rondeau).
-  * General Paz y Juniors: USD 1.100 a 1.700/m² (polo gastronómico, residencial de categoría).
-  * Güemes y Observatorio: USD 950 a 1.500/m² (área cultural y comercial en auge).
-  * Centro, Alberdi, Alto Alberdi y Quintas de Santa Ana: USD 750 a 1.150/m² (zona comercial, conectividad y consolidación).
-- ZONA NORTE RESIDENCIAL / ALTA GAMA:
-  * Cerro de las Rosas, Villa Belgrano, Urca: USD 1.250 a 1.900/m² (lotes amplios, casas de categoría y condominios modernos).
-  * Alto Verde, Colinas del Cerro, Bajo Palermo, Las Rosas, Chateau Carreras: USD 1.100 a 1.600/m².
-  * Argüello, Villa Cabrera, Poeta Lugones, Alejandro Centeno: USD 850 a 1.350/m².
-- ZONA NORTE / CENTRO RESIDENCIAL:
-  * Alta Córdoba y Cofico: USD 950 a 1.500/m² (gran demanda residencial tradicional y gastronómica).
-  * San Martín, Lomas de San Martín, Providencia, Ducasse, Escobar, La France, Marqués de Sobremonte: USD 750 a 1.100/m².
-- ZONA SUR / SUROESTE:
-  * Manantiales: USD 1.100 a 1.650/m² (urbanización moderna en fuerte expansión).
-  * Barrio Jardín, Iponá, Inaudi, Parque Vélez Sarsfield: USD 950 a 1.450/m² (cercano a Ciudad Universitaria y countries sur).
-  * Bella Vista, Paso de los Andes, Parque Capital, Los Naranjos, Los Plátanos, Las Palmas: USD 700 a 1.050/m².
-- ZONA ESTE / SURESTE:
-  * San Vicente, Crisol Norte, Crisol Sur, Maipú 1ª Sección, Maipú 2ª Sección, General Bustos, Pueyrredón, Independiente: USD 700 a 1.100/m².
+REFERENCIAS REALES DE CIERRE POR METRO CUADRADO (USD BILLETE EFECTIVO):
+1. DEPARTAMENTOS USADOS ESTÁNDAR (Centro, Alberdi, Cofico, Alta Córdoba, Pueyrredón, San Martín):
+   - USD 850 a 1.150 / m² cubierto según estado.
+2. DEPARTAMENTOS EN ZONAS DE ALTA DEMANDA (Nueva Córdoba, General Paz, Güemes):
+   - Usados consolidados: USD 1.150 a 1.500 / m².
+   - A estrenar o categoría alta: USD 1.500 a 1.950 / m².
+3. CASAS EN BARRIOS TRADICIONALES (Argüello, Villa Cabrera, Barrio Jardín, Cerro Chico, Poeta Lugones, Urca):
+   - USD 750 a 1.100 / m² cubierto (ponderando el terreno en su justa medida sin inflar m² descubiertos).
+4. BARRIOS CERRADOS, URBANIZACIONES Y COUNTRIES (Valle Escondido, Docta, Manantiales I y II, Cuesta Colorada, La Calera, La Rufina, Lomas de la Carolina, Las Delicias, Country Jockey Club, Cañuelas, Causana, Q2, Cinco Lomas, Tejas del Sur, Tejas 4):
+   - Entre USD 1.100 y 1.750 / m² cubierto según la categoría del country, seguridad y calidad constructiva. En Cuesta Colorada y urbanizaciones abiertas/semicerradas de La Calera promediar entre USD 800 y 1.150 / m² cubierto.
 
-Ponderación técnica de variables adicionales en Córdoba:
-- Antigüedad: A estrenar (+5% a +10%), 1 a 10 años (neutro / óptimo), 10 a 25 años (-5% a -12%), +25 años (-15% a -25% salvo reciclado integral).
-- Disposición: Frente suele cotizar 5% a 10% más que contrafrente en Nueva Córdoba y General Paz por luminosidad y vistas. Interno castiga entre 10% y 15%.
-- Situación Jurídica: 'Escritura inmediata' es el valor estándar pleno de mercado (apto crédito hipotecario Bancor/UVA, gran valor agregado en Córdoba). 'Boleto de compraventa' suele requerir un descuento de negociación del 5% al 12% por falta de apto crédito inmediato.
-- Amenities: La presencia de Pileta, Quincho/SUM, Asador y Seguridad 24hs defiende el techo de mercado y acelera la venta en zonas como Nueva Córdoba, General Paz o Condominios de Zona Norte.
-- Patios, jardines y balcones computan entre el 30% y el 50% del valor m² cubierto.
-- Cochera cubierta suma entre USD 8.000 y USD 16.000 según la demanda del barrio.
+CRITERIOS ESTRICTOS DE CASTIGO Y PONDERACIÓN:
+- Antigüedad: +20 años sin reciclar penaliza fuertemente entre un 15% y 25%.
+- Cochera: En departamentos de Nueva Córdoba, General Paz o Centro la falta de cochera resta un 10% de competitividad. Si tiene cochera suma USD 8.000 a 14.000 de cierre.
+- Disposición: Interno o planta baja sin patio propio castiga un 10% a 15% respecto a frente con balcón.
+- Título / Situación: Boleto de compraventa sin escritura inmediata penaliza un 10% a 12% por falta de apto crédito hipotecario Bancor/UVA.
+- Brecha de precios: Mantén una brecha estrecha y realista entre 'valor_min' (venta rápida en 30-45 días), 'valor_sugerido' (precio óptimo de mercado para cerrar en 60-90 días) y 'valor_max' (techo máximo de negociación, no más del 8% al 12% por encima del sugerido).
 
 Responde ÚNICAMENTE en formato JSON plano (sin markdown, JSON válido) con esta estructura exacta:
 {{
   "valor_min": <entero en USD, valor conservador / venta rápida>,
-  "valor_sugerido": <entero en USD, valor promedio de mercado recomendado>,
+  "valor_sugerido": <entero en USD, valor promedio de mercado recomendado de cierre>,
   "valor_max": <entero en USD, valor optimista / techo de mercado>,
   "valor_m2": <entero en USD por m² promedio ponderado estimado para la propiedad>,
-  "analisis_breve": "<1 o 2 oraciones profesionales explicando el posicionamiento en el mercado cordobés actual, ponderando su estado, título y comodidades>",
+  "analisis_breve": "<1 o 2 oraciones profesionales explicando el posicionamiento real de cierre en Córdoba/Gran Córdoba>",
   "consejos": [
-    "<Consejo 1 específico y accionable para defender el valor en Córdoba Capital>",
-    "<Consejo 2 sobre documentación (escritura/apto crédito), mejoras o presentación>",
-    "<Consejo 3 sobre estrategia comercial y velocidad de venta>"
+    "<Consejo 1 específico y accionable para defender el valor en Córdoba>",
+    "<Consejo 2 sobre documentación (escritura/apto crédito) o presentación>",
+    "<Consejo 3 sobre estrategia de negociación de precio de cierre efectivo>"
   ]
 }}
 """
@@ -439,7 +432,7 @@ def descargar_pdf():
         pdf.multi_cell(186, 4.5, limpiar_texto_pdf(f'"{analisis}"'))
 
         # 5. RECOMENDACIONES CLAVE DE EXPERTOS
-        y_pos = pdf.get_y() + 4
+        y_pos = pdf.get_y() + 3
         pdf.set_xy(12, y_pos)
         pdf.set_font("Helvetica", "B", 10)
         pdf.set_fill_color(241, 245, 249)
@@ -447,36 +440,52 @@ def descargar_pdf():
         pdf.cell(186, 6, limpiar_texto_pdf(" 4. RECOMENDACIONES CLAVE PARA DEFENDER ESTE PRECIO EN CORDOBA"), ln=1, fill=True)
 
         consejos = tasacion.get("consejos", [])
-        y_pos += 8
-        pdf.set_font("Helvetica", "", 8)
+        y_pos += 7
+        pdf.set_font("Helvetica", "", 7.5)
         pdf.set_text_color(51, 65, 85)
         for i, consejo in enumerate(consejos[:3], start=1):
             pdf.set_xy(12, y_pos)
-            pdf.set_font("Helvetica", "B", 8)
-            pdf.cell(6, 4.5, f"{i}.", ln=0)
-            pdf.set_font("Helvetica", "", 8)
-            pdf.multi_cell(180, 4.5, limpiar_texto_pdf(consejo))
-            y_pos = pdf.get_y() + 1.5
+            pdf.set_font("Helvetica", "B", 7.5)
+            pdf.cell(5, 4, f"{i}.", ln=0)
+            pdf.set_font("Helvetica", "", 7.5)
+            pdf.multi_cell(181, 4, limpiar_texto_pdf(consejo))
+            y_pos = pdf.get_y() + 1
+
+        # AVISO LEGAL Y ESTIMACIÓN ORIENTATIVA
+        y_pos = max(y_pos + 1, 238)
+        pdf.set_xy(12, y_pos)
+        pdf.set_fill_color(254, 243, 199) # Amber 100
+        pdf.set_draw_color(245, 158, 11) # Amber 500
+        pdf.rect(12, y_pos, 186, 17, 'DF')
+        pdf.set_xy(14, y_pos + 1.5)
+        pdf.set_font("Helvetica", "B", 7)
+        pdf.set_text_color(146, 64, 14) # Amber 800
+        pdf.cell(182, 3.5, limpiar_texto_pdf("AVISO DE ESTIMACION ORIENTATIVA:"), ln=1)
+        pdf.set_xy(14, y_pos + 5)
+        pdf.set_font("Helvetica", "", 6.5)
+        pdf.set_text_color(120, 53, 15)
+        aviso_legal = "Importante: Esta tasacion es una estimacion preliminar generada por inteligencia artificial en base a promedios estadisticos de la zona. No constituye una tasacion oficial ni un valor definitivo de cierre, ya que factores como la calidad constructiva, luminosidad, entorno inmediato, estado real de conservacion y documentacion pueden modificar el precio final. Para obtener una valoracion exacta y profesional, recomendamos coordinar una visita presencial sin cargo."
+        pdf.multi_cell(182, 3.2, limpiar_texto_pdf(aviso_legal))
 
         # 6. FOOTER Y LLAMADA A LA ACCIÓN (Banda inferior de cierre)
         pdf.set_fill_color(236, 253, 245) # Emerald 50
         pdf.set_draw_color(16, 185, 129) # Emerald 500
-        pdf.rect(12, 260, 186, 24, 'DF')
+        pdf.rect(12, 258, 186, 26, 'DF')
 
-        pdf.set_xy(15, 262)
+        pdf.set_xy(15, 260)
         pdf.set_font("Helvetica", "B", 9)
         pdf.set_text_color(6, 95, 70)
-        pdf.cell(180, 4.5, limpiar_texto_pdf("IMPORTANTE: CONFIRMACION DE VALOR EXACTO CON VISITA PRESENCIAL"), ln=1, align="C")
+        pdf.cell(180, 4.5, limpiar_texto_pdf("COORDINAR TASACION PRESENCIAL EXACTA SIN CARGO"), ln=1, align="C")
 
         pdf.set_font("Helvetica", "", 7.5)
         pdf.set_text_color(4, 120, 87)
-        pdf.set_xy(15, 267)
-        pdf.cell(180, 4, limpiar_texto_pdf("Este informe es un calculo estadistico. Factores como luminosidad, piso y mantenimiento definen el precio final."), ln=1, align="C")
+        pdf.set_xy(15, 265)
+        pdf.cell(180, 4, limpiar_texto_pdf("Inspeccion ocular de terminaciones, estado de conservacion y documentacion para fijar precio final de venta."), ln=1, align="C")
         
-        pdf.set_xy(15, 272)
-        pdf.set_font("Helvetica", "B", 8.5)
+        pdf.set_xy(15, 271)
+        pdf.set_font("Helvetica", "B", 9)
         pdf.set_text_color(6, 78, 59)
-        pdf.cell(180, 5, limpiar_texto_pdf(f"Agenda tu visita presencial sin cargo | WhatsApp Directo: +{MI_WHATSAPP}"), ln=1, align="C")
+        pdf.cell(180, 6, limpiar_texto_pdf(f"Agenda tu visita presencial sin cargo | WhatsApp Directo: +{MI_WHATSAPP}"), ln=1, align="C")
 
         # Generar buffer en memoria
         buffer = io.BytesIO()
