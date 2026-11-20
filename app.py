@@ -1,13 +1,15 @@
 import os
 import csv
 import json
+import io
 import urllib.parse
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 from dotenv import load_dotenv
 import requests
 from google import genai
 from google.genai import types
+from fpdf import FPDF
 
 load_dotenv()
 
@@ -257,5 +259,241 @@ def tasar():
         print(f"Error en endpoint /api/tasar: {e}")
         return jsonify({"error": "Ocurrió un error al procesar la tasación"}), 500
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+def limpiar_texto_pdf(texto):
+    """Limpia caracteres especiales, emojis o comillas tipográficas para compatibilidad con FPDF latin-1"""
+    if not texto:
+        return ""
+    texto = str(texto)
+    reemplazos = {
+        "—": "-", "–": "-", "“": '"', "”": '"', "‘": "'", "’": "'",
+        "•": "-", "…": "...", "🔥": "", "👤": "", "📱": "", "🎯": "",
+        "🏠": "", "💵": "", "📊": "", "📍": "", "✨": "", "💡": ""
+    }
+    for orig, dest in reemplazos.items():
+        texto = texto.replace(orig, dest)
+    # Codificar a latin-1 ignorando caracteres no soportados para evitar crashes
+    return texto.encode('latin-1', 'replace').decode('latin-1')
+
+def formatear_usd(valor):
+    try:
+        return f"{int(valor):,}".replace(",", ".")
+    except Exception:
+        return str(valor)
+
+@app.route("/descargar-pdf", methods=["POST"])
+def descargar_pdf():
+    try:
+        payload = request.get_json()
+        if not payload:
+            return jsonify({"error": "No se recibieron datos para el reporte"}), 400
+
+        datos = payload.get("datos", {})
+        tasacion = payload.get("tasacion", {})
+
+        pdf = FPDF(orientation="P", unit="mm", format="A4")
+        pdf.set_auto_page_break(auto=False)
+        pdf.add_page()
+        pdf.set_margins(12, 10, 12)
+
+        # 1. HEADER (Banda superior azul marino)
+        pdf.set_fill_color(15, 23, 42) # Slate 900
+        pdf.rect(0, 0, 210, 28, 'F')
+        
+        pdf.set_text_color(255, 255, 255)
+        pdf.set_font("Helvetica", "B", 14)
+        pdf.set_xy(12, 7)
+        pdf.cell(0, 7, limpiar_texto_pdf("INFORME DE ESTIMACION DE VALOR DE MERCADO"), ln=1, align="L")
+        
+        pdf.set_font("Helvetica", "", 9)
+        pdf.set_text_color(147, 197, 253) # Blue 300
+        fecha_str = datetime.now().strftime("%d/%m/%Y")
+        pdf.set_xy(12, 14)
+        pdf.cell(0, 6, limpiar_texto_pdf(f"Cordoba Capital, Argentina | Fecha de emision: {fecha_str} | Ref: INM-COR"), ln=1, align="L")
+
+        # 2. DATOS DEL PROPIETARIO Y PROPIEDAD
+        pdf.set_text_color(30, 41, 59)
+        pdf.set_xy(12, 32)
+        pdf.set_font("Helvetica", "B", 10)
+        pdf.set_fill_color(241, 245, 249) # Slate 100
+        pdf.cell(186, 6, limpiar_texto_pdf(f" 1. RESUMEN DEL INMUEBLE - PROPIETARIO: {datos.get('nombre', 'Titular')}"), ln=1, fill=True)
+
+        pdf.set_font("Helvetica", "", 8.5)
+        pdf.set_text_color(51, 65, 85)
+        
+        amenities = datos.get("amenities", [])
+        if isinstance(amenities, list):
+            amenities_str = ", ".join(amenities) if amenities else "Ninguno reportado"
+        else:
+            amenities_str = str(amenities) if amenities else "Ninguno reportado"
+
+        col_w = 93
+        y_pos = 40
+        
+        # Fila 1
+        pdf.set_xy(12, y_pos)
+        pdf.cell(col_w, 5, limpiar_texto_pdf(f"Tipo: {datos.get('tipo', 'Inmueble')}"), ln=0)
+        pdf.cell(col_w, 5, limpiar_texto_pdf(f"Barrio: {datos.get('barrio', 'Cordoba')}"), ln=1)
+        # Fila 2
+        y_pos += 5
+        pdf.set_xy(12, y_pos)
+        pdf.cell(col_w, 5, limpiar_texto_pdf(f"Superficie: {datos.get('m2_cubiertos')} m2 cubiertos | {datos.get('m2_descubiertos', 0)} m2 patio/balcon"), ln=0)
+        pdf.cell(col_w, 5, limpiar_texto_pdf(f"Dormitorios: {datos.get('dormitorios')} | Cochera: {datos.get('cochera')}"), ln=1)
+        # Fila 3
+        y_pos += 5
+        pdf.set_xy(12, y_pos)
+        pdf.cell(col_w, 5, limpiar_texto_pdf(f"Antiguedad: {datos.get('antiguedad', 'No especificado')} | Estado: {datos.get('estado', 'Bueno')}"), ln=0)
+        pdf.cell(col_w, 5, limpiar_texto_pdf(f"Disposicion: {datos.get('disposicion', 'Frente')}"), ln=1)
+        # Fila 4
+        y_pos += 5
+        pdf.set_xy(12, y_pos)
+        pdf.cell(col_w, 5, limpiar_texto_pdf(f"Situacion Juridica: {datos.get('situacion_juridica', 'Escritura')}"), ln=0)
+        pdf.cell(col_w, 5, limpiar_texto_pdf(f"Amenities: {amenities_str}"), ln=1)
+
+        # 3. CUADRO DE VALORES EN USD (3 Escenarios de Mercado)
+        y_pos += 9
+        pdf.set_xy(12, y_pos)
+        pdf.set_font("Helvetica", "B", 10)
+        pdf.set_fill_color(238, 242, 255) # Indigo 50
+        pdf.set_text_color(30, 41, 59)
+        pdf.cell(186, 6, limpiar_texto_pdf(" 2. RANGO DE VALUACION ESTIMADA EN DOLARES (USD)"), ln=1, fill=True)
+
+        y_pos += 8
+        card_w = 60
+        card_h = 24
+        
+        # Tarjeta Min
+        pdf.set_xy(12, y_pos)
+        pdf.set_fill_color(248, 250, 252)
+        pdf.set_draw_color(203, 213, 225)
+        pdf.rect(12, y_pos, card_w, card_h, 'DF')
+        pdf.set_xy(12, y_pos + 2)
+        pdf.set_font("Helvetica", "B", 7.5)
+        pdf.set_text_color(100, 116, 139)
+        pdf.cell(card_w, 4, limpiar_texto_pdf("VALOR CONSERVADOR (Venta Rapida)"), ln=1, align="C")
+        pdf.set_xy(12, y_pos + 8)
+        pdf.set_font("Helvetica", "B", 12)
+        pdf.set_text_color(51, 65, 85)
+        pdf.cell(card_w, 7, f"USD {formatear_usd(tasacion.get('valor_min', 0))}", ln=1, align="C")
+        pdf.set_font("Helvetica", "", 7)
+        pdf.set_text_color(148, 163, 184)
+        pdf.cell(card_w, 4, limpiar_texto_pdf("Cierre agil / Ofertas contado"), ln=1, align="C")
+
+        # Tarjeta Sugerida (Destacada)
+        pdf.set_xy(75, y_pos)
+        pdf.set_fill_color(239, 246, 255) # Blue 50
+        pdf.set_draw_color(37, 99, 235) # Blue 600
+        pdf.rect(75, y_pos, card_w, card_h, 'DF')
+        pdf.set_xy(75, y_pos + 2)
+        pdf.set_font("Helvetica", "B", 8)
+        pdf.set_text_color(29, 78, 216)
+        pdf.cell(card_w, 4, limpiar_texto_pdf("VALOR DE MERCADO SUGERIDO"), ln=1, align="C")
+        pdf.set_xy(75, y_pos + 8)
+        pdf.set_font("Helvetica", "B", 13)
+        pdf.set_text_color(29, 78, 216)
+        pdf.cell(card_w, 7, f"USD {formatear_usd(tasacion.get('valor_sugerido', 0))}", ln=1, align="C")
+        pdf.set_font("Helvetica", "B", 7)
+        pdf.set_text_color(37, 99, 235)
+        pdf.cell(card_w, 4, limpiar_texto_pdf("Equilibrio optimo / Tiempo 45-90 dias"), ln=1, align="C")
+
+        # Tarjeta Max
+        pdf.set_xy(138, y_pos)
+        pdf.set_fill_color(248, 250, 252)
+        pdf.set_draw_color(203, 213, 225)
+        pdf.rect(138, y_pos, card_w, card_h, 'DF')
+        pdf.set_xy(138, y_pos + 2)
+        pdf.set_font("Helvetica", "B", 7.5)
+        pdf.set_text_color(100, 116, 139)
+        pdf.cell(card_w, 4, limpiar_texto_pdf("VALOR OPTIMISTA (Techo Negociacion)"), ln=1, align="C")
+        pdf.set_xy(138, y_pos + 8)
+        pdf.set_font("Helvetica", "B", 12)
+        pdf.set_text_color(51, 65, 85)
+        pdf.cell(card_w, 7, f"USD {formatear_usd(tasacion.get('valor_max', 0))}", ln=1, align="C")
+        pdf.set_font("Helvetica", "", 7)
+        pdf.set_text_color(148, 163, 184)
+        pdf.cell(card_w, 4, limpiar_texto_pdf("Comprador especifico / +150 dias"), ln=1, align="C")
+
+        # Cinta informativa m2
+        y_pos += card_h + 3
+        pdf.set_xy(12, y_pos)
+        pdf.set_fill_color(241, 245, 249)
+        pdf.set_draw_color(226, 232, 240)
+        pdf.rect(12, y_pos, 186, 6, 'DF')
+        pdf.set_font("Helvetica", "B", 8)
+        pdf.set_text_color(30, 41, 59)
+        pdf.set_xy(15, y_pos + 1)
+        pdf.cell(90, 4, limpiar_texto_pdf(f"Valor Promedio Estimado por m2 en la zona: USD {tasacion.get('valor_m2', 0)} / m2"), ln=0)
+        pdf.cell(90, 4, limpiar_texto_pdf(f"Ubicacion de Referencia: {datos.get('barrio', 'Cordoba')}"), ln=1, align="R")
+
+        # 4. ANALISIS PROFESIONAL DE MERCADO
+        y_pos += 10
+        pdf.set_xy(12, y_pos)
+        pdf.set_font("Helvetica", "B", 10)
+        pdf.set_fill_color(241, 245, 249)
+        pdf.cell(186, 6, limpiar_texto_pdf(" 3. DIAGNOSTICO Y POSICIONAMIENTO EN MERCADO ACTUAL"), ln=1, fill=True)
+
+        y_pos += 8
+        pdf.set_xy(12, y_pos)
+        pdf.set_font("Helvetica", "I", 8.5)
+        pdf.set_text_color(51, 65, 85)
+        analisis = tasacion.get("analisis_breve", "Propiedad con parametros acordes al mercado cordobes.")
+        pdf.multi_cell(186, 4.5, limpiar_texto_pdf(f'"{analisis}"'))
+
+        # 5. RECOMENDACIONES CLAVE DE EXPERTOS
+        y_pos = pdf.get_y() + 4
+        pdf.set_xy(12, y_pos)
+        pdf.set_font("Helvetica", "B", 10)
+        pdf.set_fill_color(241, 245, 249)
+        pdf.set_text_color(30, 41, 59)
+        pdf.cell(186, 6, limpiar_texto_pdf(" 4. RECOMENDACIONES CLAVE PARA DEFENDER ESTE PRECIO EN CORDOBA"), ln=1, fill=True)
+
+        consejos = tasacion.get("consejos", [])
+        y_pos += 8
+        pdf.set_font("Helvetica", "", 8)
+        pdf.set_text_color(51, 65, 85)
+        for i, consejo in enumerate(consejos[:3], start=1):
+            pdf.set_xy(12, y_pos)
+            pdf.set_font("Helvetica", "B", 8)
+            pdf.cell(6, 4.5, f"{i}.", ln=0)
+            pdf.set_font("Helvetica", "", 8)
+            pdf.multi_cell(180, 4.5, limpiar_texto_pdf(consejo))
+            y_pos = pdf.get_y() + 1.5
+
+        # 6. FOOTER Y LLAMADA A LA ACCIÓN (Banda inferior de cierre)
+        pdf.set_fill_color(236, 253, 245) # Emerald 50
+        pdf.set_draw_color(16, 185, 129) # Emerald 500
+        pdf.rect(12, 260, 186, 24, 'DF')
+
+        pdf.set_xy(15, 262)
+        pdf.set_font("Helvetica", "B", 9)
+        pdf.set_text_color(6, 95, 70)
+        pdf.cell(180, 4.5, limpiar_texto_pdf("IMPORTANTE: CONFIRMACION DE VALOR EXACTO CON VISITA PRESENCIAL"), ln=1, align="C")
+
+        pdf.set_font("Helvetica", "", 7.5)
+        pdf.set_text_color(4, 120, 87)
+        pdf.set_xy(15, 267)
+        pdf.cell(180, 4, limpiar_texto_pdf("Este informe es un calculo estadistico. Factores como luminosidad, piso y mantenimiento definen el precio final."), ln=1, align="C")
+        
+        pdf.set_xy(15, 272)
+        pdf.set_font("Helvetica", "B", 8.5)
+        pdf.set_text_color(6, 78, 59)
+        pdf.cell(180, 5, limpiar_texto_pdf(f"Agenda tu visita presencial sin cargo | WhatsApp Directo: +{MI_WHATSAPP}"), ln=1, align="C")
+
+        # Generar buffer en memoria
+        buffer = io.BytesIO()
+        pdf.output(buffer)
+        buffer.seek(0)
+
+        barrio_limpio = "".join(c for c in datos.get("barrio", "Cordoba") if c.isalnum() or c in (' ', '_')).strip().replace(' ', '_')
+        filename = f"Informe_Tasacion_{barrio_limpio}.pdf"
+
+        return send_file(
+            buffer,
+            mimetype="application/pdf",
+            as_attachment=True,
+            download_name=filename
+        )
+
+    except Exception as e:
+        print(f"Error generando PDF: {e}")
+        return jsonify({"error": f"Error al generar PDF: {str(e)}"}), 500
+
