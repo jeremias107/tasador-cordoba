@@ -131,10 +131,14 @@ REFERENCIAS REALES DE CIERRE POR METRO CUADRADO (USD BILLETE EFECTIVO):
 2. DEPARTAMENTOS EN ZONAS DE ALTA DEMANDA (Nueva Córdoba, General Paz, Güemes):
    - Usados consolidados: USD 1.150 a 1.500 / m².
    - A estrenar o categoría alta: USD 1.500 a 1.950 / m².
-3. CASAS EN BARRIOS TRADICIONALES (Argüello, Villa Cabrera, Barrio Jardín, Cerro Chico, Poeta Lugones, Urca):
-   - USD 750 a 1.100 / m² cubierto (ponderando el terreno en su justa medida sin inflar m² descubiertos).
-4. BARRIOS CERRADOS, URBANIZACIONES Y COUNTRIES (Valle Escondido, Docta, Manantiales I y II, Cuesta Colorada, La Calera, La Rufina, Lomas de la Carolina, Las Delicias, Country Jockey Club, Cañuelas, Causana, Q2, Cinco Lomas, Tejas del Sur, Tejas 4):
-   - Entre USD 1.100 y 1.750 / m² cubierto según la categoría del country, seguridad y calidad constructiva. En Cuesta Colorada y urbanizaciones abiertas/semicerradas de La Calera promediar entre USD 800 y 1.150 / m² cubierto.
+3. CASAS EN BARRIOS RESIDENCIALES Y ZONA SUR / NORTE:
+   - Zonas residenciales de alta demanda (Cerro de las Rosas, Urca, Quintas de los Nores, Jardín Espinosa, Rogelio Martínez, Barrio Jardín, Villa Belgrano): USD 950 a 1.350 / m² cubierto según estado y dimensiones de lote.
+   - Barrios residenciales tradicionales (Argüello, Villa Cabrera, Cerro Chico, Poeta Lugones, Ampliación Poeta Lugones, Alto Palermo, Granja de Funes, Quintas de Argüello, Alto Verde, Los Carolinos): USD 750 a 1.100 / m² cubierto.
+   - Barrios consolidados de valor medio (Yofre Norte/Sur, Residencial América, San Fernando, Ayacucho, Altamira, Parque Liceo, Villa Azalais, Santa Isabel, Parque República, Los Boulevares): USD 650 a 950 / m² cubierto.
+4. BARRIOS CERRADOS, COUNTRIES Y URBANIZACIONES:
+   - Countries consolidados premium (Country Las Delicias, Country Jockey Club, Country Lomas de la Carolina, Cañuelas Country Golf, Fincas del Sur, La Carolina, El Refugio, La Rufina, Q2, Cinco Lomas): USD 1.250 a 1.750 / m² cubierto.
+   - Barrios cerrados en sierras y urbanizaciones consolidadas (Country La Cuesta en La Calera, Valle Escondido, Manantiales I y II, Miradores/Prados de Manantiales, Docta, Causana, Siete Soles, La Deseada, La Estanzuela, Claros del Bosque, Tejas del Sur, Tejas 4): USD 1.100 a 1.600 / m² cubierto según nivel de amenities y seguridad.
+   - Urbanizaciones abiertas / semicerradas de La Calera y Sierras Chicas (Cuesta Colorada, El Diquecito, Mendiolaza abierta, Villa Allende abierta): USD 800 a 1.150 / m² cubierto.
 
 CRITERIOS ESTRICTOS DE CASTIGO Y PONDERACIÓN:
 - Antigüedad: +20 años sin reciclar penaliza fuertemente entre un 15% y 25%.
