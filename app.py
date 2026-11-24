@@ -4,7 +4,7 @@ import json
 import io
 import urllib.parse
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, Response
 from dotenv import load_dotenv
 import requests
 from google import genai
@@ -207,6 +207,10 @@ Responde ÚNICAMENTE en formato JSON plano (sin markdown, JSON válido) con esta
                 "Iniciar la comercialización en valor competitivo para atraer compradores calificados en los primeros 30 días."
             ]
         }
+
+@app.route("/ping", methods=["GET", "HEAD"])
+def ping():
+    return Response("OK", status=200, mimetype="text/plain")
 
 @app.route("/")
 def index():
