@@ -288,27 +288,47 @@ def descargar_pdf():
         pdf.add_page()
         pdf.set_margins(12, 10, 12)
 
-        # 1. HEADER (Banda superior azul marino)
-        pdf.set_fill_color(15, 23, 42) # Slate 900
-        pdf.rect(0, 0, 210, 28, 'F')
+        # 1. HEADER INSTITUCIONAL (Conejero y Asociados)
+        # Fondo blanco con franja superior e inferior verde institucional
+        pdf.set_fill_color(39, 111, 35) # Verde institucional Conejero #276f23
+        pdf.rect(0, 0, 210, 4, 'F')
         
-        pdf.set_text_color(255, 255, 255)
-        pdf.set_font("Helvetica", "B", 14)
-        pdf.set_xy(12, 7)
-        pdf.cell(0, 7, limpiar_texto_pdf("INFORME DE ESTIMACION DE VALOR DE MERCADO"), ln=1, align="L")
+        pdf.set_fill_color(240, 249, 239) # Conejero 50
+        pdf.rect(0, 4, 210, 26, 'F')
+
+        # Logotipo Conejero y Asociados
+        logo_path = os.path.join(os.path.dirname(__file__), "static", "logo_conejero.png")
+        if os.path.exists(logo_path):
+            try:
+                pdf.image(logo_path, x=12, y=6.5, w=38)
+            except Exception as e:
+                print(f"Error cargando logo en PDF: {e}")
+
+        pdf.set_xy(54, 7)
+        pdf.set_text_color(23, 58, 22) # Conejero 900
+        pdf.set_font("Helvetica", "B", 13)
+        pdf.cell(0, 6, limpiar_texto_pdf("CONEJERO Y ASOCIADOS — INMOBILIARIA"), ln=1, align="L")
         
-        pdf.set_font("Helvetica", "", 9)
-        pdf.set_text_color(147, 197, 253) # Blue 300
+        pdf.set_xy(54, 13)
+        pdf.set_font("Helvetica", "B", 9)
+        pdf.set_text_color(39, 111, 35) # Verde Conejero
+        pdf.cell(0, 5, limpiar_texto_pdf("INFORME OFICIAL DE ESTIMACION DE VALOR DE MERCADO"), ln=1, align="L")
+
+        pdf.set_xy(54, 18.5)
+        pdf.set_font("Helvetica", "", 7.5)
+        pdf.set_text_color(100, 116, 139)
         fecha_str = datetime.now().strftime("%d/%m/%Y")
-        pdf.set_xy(12, 14)
-        pdf.cell(0, 6, limpiar_texto_pdf(f"Cordoba Capital, Argentina | Fecha de emision: {fecha_str} | Ref: INM-COR"), ln=1, align="L")
+        pdf.cell(0, 4.5, limpiar_texto_pdf(f"Cordoba Capital y Gran Cordoba | Fecha de emision: {fecha_str} | Cerro de las Rosas"), ln=1, align="L")
+
+        pdf.set_fill_color(39, 111, 35)
+        pdf.rect(0, 30, 210, 1, 'F')
 
         # 2. DATOS DEL PROPIETARIO Y PROPIEDAD
-        pdf.set_text_color(30, 41, 59)
-        pdf.set_xy(12, 32)
-        pdf.set_font("Helvetica", "B", 10)
-        pdf.set_fill_color(241, 245, 249) # Slate 100
-        pdf.cell(186, 6, limpiar_texto_pdf(f" 1. RESUMEN DEL INMUEBLE - PROPIETARIO: {datos.get('nombre', 'Titular')}"), ln=1, fill=True)
+        pdf.set_text_color(23, 58, 22)
+        pdf.set_xy(12, 34)
+        pdf.set_font("Helvetica", "B", 9.5)
+        pdf.set_fill_color(240, 249, 239) # Conejero 50
+        pdf.cell(186, 6, limpiar_texto_pdf(f" 1. RESUMEN DEL INMUEBLE — PROPIETARIO: {datos.get('nombre', 'Titular')}"), ln=1, fill=True)
 
         pdf.set_font("Helvetica", "", 8.5)
         pdf.set_text_color(51, 65, 85)
@@ -320,12 +340,12 @@ def descargar_pdf():
             amenities_str = str(amenities) if amenities else "Ninguno reportado"
 
         col_w = 93
-        y_pos = 40
+        y_pos = 41
         
         # Fila 1
         pdf.set_xy(12, y_pos)
         pdf.cell(col_w, 5, limpiar_texto_pdf(f"Tipo: {datos.get('tipo', 'Inmueble')}"), ln=0)
-        pdf.cell(col_w, 5, limpiar_texto_pdf(f"Barrio: {datos.get('barrio', 'Cordoba')}"), ln=1)
+        pdf.cell(col_w, 5, limpiar_texto_pdf(f"Barrio / Zona: {datos.get('barrio', 'Cordoba')}"), ln=1)
         # Fila 2
         y_pos += 5
         pdf.set_xy(12, y_pos)
@@ -342,12 +362,12 @@ def descargar_pdf():
         pdf.cell(col_w, 5, limpiar_texto_pdf(f"Situacion Juridica: {datos.get('situacion_juridica', 'Escritura')}"), ln=0)
         pdf.cell(col_w, 5, limpiar_texto_pdf(f"Amenities: {amenities_str}"), ln=1)
 
-        # 3. CUADRO DE VALORES EN USD (3 Escenarios de Mercado)
+        # 3. CUADRO DE VALORES EN USD (3 Escenarios de Cierre)
         y_pos += 9
         pdf.set_xy(12, y_pos)
-        pdf.set_font("Helvetica", "B", 10)
-        pdf.set_fill_color(238, 242, 255) # Indigo 50
-        pdf.set_text_color(30, 41, 59)
+        pdf.set_font("Helvetica", "B", 9.5)
+        pdf.set_fill_color(240, 249, 239) # Conejero 50
+        pdf.set_text_color(23, 58, 22)
         pdf.cell(186, 6, limpiar_texto_pdf(" 2. RANGO DE VALUACION ESTIMADA EN DOLARES (USD)"), ln=1, fill=True)
 
         y_pos += 8
@@ -371,22 +391,22 @@ def descargar_pdf():
         pdf.set_text_color(148, 163, 184)
         pdf.cell(card_w, 4, limpiar_texto_pdf("Cierre agil / Ofertas contado"), ln=1, align="C")
 
-        # Tarjeta Sugerida (Destacada)
+        # Tarjeta Sugerida (Destacada con Verde Conejero)
         pdf.set_xy(75, y_pos)
-        pdf.set_fill_color(239, 246, 255) # Blue 50
-        pdf.set_draw_color(37, 99, 235) # Blue 600
+        pdf.set_fill_color(240, 249, 239) # Conejero 50
+        pdf.set_draw_color(39, 111, 35) # Conejero verde
         pdf.rect(75, y_pos, card_w, card_h, 'DF')
         pdf.set_xy(75, y_pos + 2)
         pdf.set_font("Helvetica", "B", 8)
-        pdf.set_text_color(29, 78, 216)
-        pdf.cell(card_w, 4, limpiar_texto_pdf("VALOR DE MERCADO SUGERIDO"), ln=1, align="C")
+        pdf.set_text_color(31, 87, 28) # Verde oscuro
+        pdf.cell(card_w, 4, limpiar_texto_pdf("VALOR SUGERIDO DE CIERRE"), ln=1, align="C")
         pdf.set_xy(75, y_pos + 8)
         pdf.set_font("Helvetica", "B", 13)
-        pdf.set_text_color(29, 78, 216)
+        pdf.set_text_color(39, 111, 35)
         pdf.cell(card_w, 7, f"USD {formatear_usd(tasacion.get('valor_sugerido', 0))}", ln=1, align="C")
         pdf.set_font("Helvetica", "B", 7)
-        pdf.set_text_color(37, 99, 235)
-        pdf.cell(card_w, 4, limpiar_texto_pdf("Equilibrio optimo / Tiempo 45-90 dias"), ln=1, align="C")
+        pdf.set_text_color(31, 87, 28)
+        pdf.cell(card_w, 4, limpiar_texto_pdf("Equilibrio optimo / 45-90 dias"), ln=1, align="C")
 
         # Tarjeta Max
         pdf.set_xy(138, y_pos)
@@ -408,20 +428,21 @@ def descargar_pdf():
         # Cinta informativa m2
         y_pos += card_h + 3
         pdf.set_xy(12, y_pos)
-        pdf.set_fill_color(241, 245, 249)
-        pdf.set_draw_color(226, 232, 240)
+        pdf.set_fill_color(240, 249, 239)
+        pdf.set_draw_color(187, 227, 188)
         pdf.rect(12, y_pos, 186, 6, 'DF')
         pdf.set_font("Helvetica", "B", 8)
-        pdf.set_text_color(30, 41, 59)
+        pdf.set_text_color(23, 58, 22)
         pdf.set_xy(15, y_pos + 1)
-        pdf.cell(90, 4, limpiar_texto_pdf(f"Valor Promedio Estimado por m2 en la zona: USD {tasacion.get('valor_m2', 0)} / m2"), ln=0)
-        pdf.cell(90, 4, limpiar_texto_pdf(f"Ubicacion de Referencia: {datos.get('barrio', 'Cordoba')}"), ln=1, align="R")
+        pdf.cell(90, 4, limpiar_texto_pdf(f"Valor Real de Cierre Estimado por m2: USD {tasacion.get('valor_m2', 0)} / m2"), ln=0)
+        pdf.cell(90, 4, limpiar_texto_pdf(f"Zona de Referencia: {datos.get('barrio', 'Cordoba')}"), ln=1, align="R")
 
         # 4. ANALISIS PROFESIONAL DE MERCADO
         y_pos += 10
         pdf.set_xy(12, y_pos)
-        pdf.set_font("Helvetica", "B", 10)
-        pdf.set_fill_color(241, 245, 249)
+        pdf.set_font("Helvetica", "B", 9.5)
+        pdf.set_fill_color(240, 249, 239)
+        pdf.set_text_color(23, 58, 22)
         pdf.cell(186, 6, limpiar_texto_pdf(" 3. DIAGNOSTICO Y POSICIONAMIENTO EN MERCADO ACTUAL"), ln=1, fill=True)
 
         y_pos += 8
@@ -434,9 +455,9 @@ def descargar_pdf():
         # 5. RECOMENDACIONES CLAVE DE EXPERTOS
         y_pos = pdf.get_y() + 3
         pdf.set_xy(12, y_pos)
-        pdf.set_font("Helvetica", "B", 10)
-        pdf.set_fill_color(241, 245, 249)
-        pdf.set_text_color(30, 41, 59)
+        pdf.set_font("Helvetica", "B", 9.5)
+        pdf.set_fill_color(240, 249, 239)
+        pdf.set_text_color(23, 58, 22)
         pdf.cell(186, 6, limpiar_texto_pdf(" 4. RECOMENDACIONES CLAVE PARA DEFENDER ESTE PRECIO EN CORDOBA"), ln=1, fill=True)
 
         consejos = tasacion.get("consejos", [])
@@ -452,7 +473,7 @@ def descargar_pdf():
             y_pos = pdf.get_y() + 1
 
         # AVISO LEGAL Y ESTIMACIÓN ORIENTATIVA
-        y_pos = max(y_pos + 1, 238)
+        y_pos = max(y_pos + 1, 237)
         pdf.set_xy(12, y_pos)
         pdf.set_fill_color(254, 243, 199) # Amber 100
         pdf.set_draw_color(245, 158, 11) # Amber 500
@@ -464,28 +485,33 @@ def descargar_pdf():
         pdf.set_xy(14, y_pos + 5)
         pdf.set_font("Helvetica", "", 6.5)
         pdf.set_text_color(120, 53, 15)
-        aviso_legal = "Importante: Esta tasacion es una estimacion preliminar generada por inteligencia artificial en base a promedios estadisticos de la zona. No constituye una tasacion oficial ni un valor definitivo de cierre, ya que factores como la calidad constructiva, luminosidad, entorno inmediato, estado real de conservacion y documentacion pueden modificar el precio final. Para obtener una valoracion exacta y profesional, recomendamos coordinar una visita presencial sin cargo."
+        aviso_legal = "Importante: Esta tasacion es una estimacion preliminar generada por inteligencia artificial en base a promedios estadisticos de la zona. No constituye una tasacion oficial ni un valor definitivo de cierre, ya que factores como la calidad constructiva, luminosidad, entorno inmediato, estado real de conservacion y documentacion pueden modificar el precio final. Para obtener una valoracion exacta y profesional, recomendamos coordinar una visita presencial sin cargo con nuestros martilleros y asesores."
         pdf.multi_cell(182, 3.2, limpiar_texto_pdf(aviso_legal))
 
-        # 6. FOOTER Y LLAMADA A LA ACCIÓN (Banda inferior de cierre)
-        pdf.set_fill_color(236, 253, 245) # Emerald 50
-        pdf.set_draw_color(16, 185, 129) # Emerald 500
-        pdf.rect(12, 258, 186, 26, 'DF')
+        # 6. FOOTER INSTITUCIONAL CONEJERO Y ASOCIADOS
+        pdf.set_fill_color(240, 249, 239) # Conejero 50
+        pdf.set_draw_color(39, 111, 35) # Verde Conejero
+        pdf.rect(12, 257, 186, 27, 'DF')
 
-        pdf.set_xy(15, 260)
+        pdf.set_xy(15, 259)
         pdf.set_font("Helvetica", "B", 9)
-        pdf.set_text_color(6, 95, 70)
-        pdf.cell(180, 4.5, limpiar_texto_pdf("COORDINAR TASACION PRESENCIAL EXACTA SIN CARGO"), ln=1, align="C")
+        pdf.set_text_color(23, 58, 22)
+        pdf.cell(180, 4.5, limpiar_texto_pdf("CONEJERO Y ASOCIADOS — COORDINAR VISITA PRESENCIAL SIN CARGO"), ln=1, align="C")
 
         pdf.set_font("Helvetica", "", 7.5)
-        pdf.set_text_color(4, 120, 87)
-        pdf.set_xy(15, 265)
+        pdf.set_text_color(39, 111, 35)
+        pdf.set_xy(15, 264)
         pdf.cell(180, 4, limpiar_texto_pdf("Inspeccion ocular de terminaciones, estado de conservacion y documentacion para fijar precio final de venta."), ln=1, align="C")
         
-        pdf.set_xy(15, 271)
-        pdf.set_font("Helvetica", "B", 9)
-        pdf.set_text_color(6, 78, 59)
-        pdf.cell(180, 6, limpiar_texto_pdf(f"Agenda tu visita presencial sin cargo | WhatsApp Directo: +{MI_WHATSAPP}"), ln=1, align="C")
+        pdf.set_xy(15, 269)
+        pdf.set_font("Helvetica", "B", 8)
+        pdf.set_text_color(23, 58, 22)
+        pdf.cell(180, 4.5, limpiar_texto_pdf(f"WhatsApp Oficial: +{MI_WHATSAPP} | Tel: 351 216-4909 / 351 378-5592 / 351 642-3716"), ln=1, align="C")
+
+        pdf.set_xy(15, 274.5)
+        pdf.set_font("Helvetica", "", 6.8)
+        pdf.set_text_color(100, 116, 139)
+        pdf.cell(180, 4, limpiar_texto_pdf("Jose Roque Funes 1761, Piso 1, Of. 'E' - Cerro de las Rosas, Cordoba | www.conejeroyasociados.com.ar"), ln=1, align="C")
 
         # Generar buffer en memoria
         buffer = io.BytesIO()
